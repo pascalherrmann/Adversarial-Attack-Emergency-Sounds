@@ -8,7 +8,7 @@
 			"path_training": "/nfs/students/summer-term-2020/project-4/data/dataset0/train",
 			"path_validation": "/nfs/students/summer-term-2020/project-4/data/dataset0/eval",
 			"path_testing": "/nfs/students/summer-term-2020/project-4/data/dataset0/eval",
-			"description": "Dataset used for initially provided github repo https://github.com/sheelabhadra/Emergency-Vehicle-Detection. Be aware that they use the evaluation set for both validaton and testing. Only recommended for reproducing results, not for active development."
+			"description": "Dataset used for initially provided github repo https://github.com/sheelabhadra/Emergency-Vehicle-Detection. Be aware that they use the evaluation set for both validaton and testing: https://github.com/sheelabhadra/Emergency-Vehicle-Detection/blob/c0e59729d4eaf9389c27bc5c0891a8283f6dc835/Paper-3/em_detection.py#L167. Only recommended for reproducing results, not for active development."
 		}
 
 	]
