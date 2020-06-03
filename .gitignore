@@ -5,4 +5,3 @@
 *.save
 /src/evd-papers/paper-3/pyAudioAnalysis/data/*
 *.ipynb_checkpoints 
-.vscode
