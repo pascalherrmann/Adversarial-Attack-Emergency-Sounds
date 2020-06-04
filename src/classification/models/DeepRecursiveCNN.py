@@ -2,8 +2,6 @@ import torch.nn as nn
 
 class DeepRecursiveCNN(nn.Module):
     def __init__(self, hidden_dim=100, numChunksList=[5,2,1]):
-        super(self).__init__()
-        
         self.hidden_dim = hidden_dim 
         
         self.numChunksList = numChunksList # full sequence, half/half, 2sec split
