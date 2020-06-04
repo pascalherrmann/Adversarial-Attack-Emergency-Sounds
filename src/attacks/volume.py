@@ -1,5 +1,7 @@
 from attacks.attack import Attack
+
 import torch.nn.functional as F
+import torch
 
 class VolumeAttack(Attack):
     

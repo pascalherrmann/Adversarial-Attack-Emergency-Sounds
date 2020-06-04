@@ -1,4 +1,5 @@
 from attacks.attack import Attack
+
 import torch.nn.functional as F
 
 class PGD(Attack):

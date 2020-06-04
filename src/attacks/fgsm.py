@@ -1,4 +1,5 @@
 from attacks.attack import Attack
+
 import torch.nn.functional as F
 
 class FGSM(Attack):
@@ -11,5 +12,7 @@ class FGSM(Attack):
         loss.backward()
 
         x = x + epsilon * x.grad.data.sign()
-        x = x.clamp(-1, 1).detach()  # projection
+
+        # projection in case epsilon is too large
+        x = x.clamp(-1, 1).detach()  
         return x
