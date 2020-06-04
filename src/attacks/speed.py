@@ -38,8 +38,8 @@ class TimeStretchAttack(Attack):
         if speedup_rate == 1:
             return sample
 
-        n_fft = 2048  # windowsize
-        hop_length = int(np.floor(n_fft / 4))
+        n_fft = torch.tensor(2048)  # windowsize
+        hop_length = torch.floor(n_fft / 4)
 
         # time stretch
         stft = torch.stft(sample, n_fft, hop_length=hop_length, window=window).unsqueeze(0)
