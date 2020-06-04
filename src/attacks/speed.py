@@ -39,7 +39,7 @@ class TimeStretchAttack(Attack):
             return sample
 
         n_fft = torch.tensor(2048)  # windowsize
-        hop_length = torch.floor(n_fft / 4.0)
+        hop_length = torch.floor(n_fft / 4.0).int().item()
 
         # time stretch
         stft = torch.stft(sample, n_fft.item(), hop_length=hop_length).unsqueeze(0)
