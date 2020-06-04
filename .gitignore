@@ -6,3 +6,5 @@
 /src/evd-papers/paper-3/pyAudioAnalysis/data/*
 *.ipynb_checkpoints 
 .vscode
+__pycache__/
+*.py[cod]
