@@ -46,7 +46,7 @@ class Attack(ABC):
     
     def predictClass(self, x):
         self.model.eval().cuda()
-        return self.torch.max(self.model(x).data, 1)[1]
+        return torch.max(self.model(x).data, 1)[1]
     
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
