@@ -2,6 +2,7 @@ from attacks.attack import Attack
 
 from torchaudio import functional as AF
 import torch.nn.functional as F
+import math
 import torch
 
 class TimeStretchAttack(Attack):
