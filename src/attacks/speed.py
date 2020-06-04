@@ -14,7 +14,7 @@ class TimeStretchAttack(Attack):
         stretching_rate > 1 means slowdown
     """
     def attackSample(self, x, y, epsilon=0, num_iter=1, lower=0.9, upper=1.1):
-        rate_search_range = torch.arange(a, b, float(1)/num_iter)
+        rate_search_range = torch.arange(lower, upper, float(1)/num_iter)
         losses = []
         stretched_inputs = []
 
