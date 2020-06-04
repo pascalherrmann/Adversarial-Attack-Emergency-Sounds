@@ -74,3 +74,6 @@ class DeepRecursiveCNN(nn.Module):
         x = self.fcN(F.relu(x))
 
         return F.log_softmax(x,dim=1)
+
+if __name__ == '__main__':
+    pass
