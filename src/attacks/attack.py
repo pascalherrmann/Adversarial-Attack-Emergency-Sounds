@@ -51,7 +51,25 @@ class Attack(ABC):
     def predictClass(self, x):
         self.model.eval().cuda()
         return torch.max(self.model(x).data, 1)[1]
+
+    def report(self):
+        print(f"Attack-Parameters:\t{fgsm.attack_parameters}")
+        print(f"Early stopping: \t{fgsm.early_stopping > 0} ({fgsm.early_stopping})\n")
+        print(f"Successfully attacked:\t{fgsm.success}")
+        print(f"Total attacked: \t{fgsm.totalAttacked}")
+        print(f"Total processed:\t{fgsm.totalProcessed}\n")
+        print(f"Success-Rate: \t\t{self.getSuccessRate()}")
+        print(f"Perturbed Accurracy: \t{self.getAccuracy})\n")
     
+    def getSuccessRate(self):
+        assert self.totalAttacked > 0
+        return fgsm.success/float(fgsm.totalAttacked)
+
+    def getAccuracy(self):
+        assert self.totalProcessed > 0
+        # attack_failed = model still correct
+        return self.failed/float(self.totalProcessed)
+
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
         pass # Implement attack in subclass
