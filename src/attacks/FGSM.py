@@ -1,4 +1,4 @@
-import .Attack
+import Attack
 
 class FGSM(Attack):
     
@@ -12,3 +12,6 @@ class FGSM(Attack):
         
         perturbed_sample = x + epsilon * x.grad.data.sign()
         return perturbed_sample
+
+if __name__ == '__main__':
+    pass

@@ -47,3 +47,6 @@ class Attack(ABC):
     @abstractmethod
     def attackSample(self, model, data, target, **attack_parameters):
         pass # Implement attack in subclass
+
+if __name__ == '__main__':
+    pass
