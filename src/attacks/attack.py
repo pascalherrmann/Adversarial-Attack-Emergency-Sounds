@@ -51,7 +51,7 @@ class Attack(ABC):
             self.adversarial_examples.append(adversarial_example)
 
     def showAdversarialExample(self, target_class=0):
-        allOfOneClass = [s for s in self.adversarial_example if s[1]==target_class]
+        allOfOneClass = [s for s in self.adversarial_examples if s[1]==target_class]
         random_sample = random.sample(allOfOneClass)
         original = random_sample[-2]
         adversarial = random_sample[-1]
