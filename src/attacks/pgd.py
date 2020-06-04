@@ -7,7 +7,7 @@ class PGD(Attack):
         for i in range(num_iter):
             x.requires_grad_()
             loss = F.nll_loss(self.model(x), y)
-            model.zero_grad()
+            self.model.zero_grad()
             loss.backward()
 
             x = x + epsilon * x.grad.data
