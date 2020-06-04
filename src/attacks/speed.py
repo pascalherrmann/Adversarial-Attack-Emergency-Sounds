@@ -42,11 +42,11 @@ class TimeStretchAttack(Attack):
         hop_length = torch.floor(n_fft / 4)
 
         # time stretch
-        stft = torch.stft(sample, n_fft, hop_length=hop_length).unsqueeze(0)
+        stft = torch.stft(sample, n_fft.item(), hop_length=hop_length).unsqueeze(0)
         phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None]
         # time stretch via phase_vocoder (not differentiable):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
-        istft = AF.istft(vocoded, n_fft, hop_length=hop_length).squeeze()
+        istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
 
         # padding
         max_length = sample.shape[0]
