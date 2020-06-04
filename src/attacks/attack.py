@@ -53,17 +53,17 @@ class Attack(ABC):
         return torch.max(self.model(x).data, 1)[1]
 
     def report(self):
-        print(f"Attack-Parameters:\t{fgsm.attack_parameters}")
-        print(f"Early stopping: \t{fgsm.early_stopping > 0} ({fgsm.early_stopping})\n")
-        print(f"Successfully attacked:\t{fgsm.success}")
-        print(f"Total attacked: \t{fgsm.totalAttacked}")
-        print(f"Total processed:\t{fgsm.totalProcessed}\n")
+        print(f"Attack-Parameters:\t{self.attack_parameters}")
+        print(f"Early stopping: \t{self.early_stopping > 0} ({self.early_stopping})\n")
+        print(f"Successfully attacked:\t{self.success}")
+        print(f"Total attacked: \t{self.totalAttacked}")
+        print(f"Total processed:\t{self.totalProcessed}\n")
         print(f"Success-Rate: \t\t{self.getSuccessRate()}")
         print(f"Perturbed Accurracy: \t{self.getAccuracy})\n")
     
     def getSuccessRate(self):
         assert self.totalAttacked > 0
-        return fgsm.success/float(fgsm.totalAttacked)
+        return self.success/float(self.totalAttacked)
 
     def getAccuracy(self):
         assert self.totalProcessed > 0
