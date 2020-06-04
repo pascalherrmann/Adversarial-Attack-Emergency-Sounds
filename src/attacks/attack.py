@@ -10,13 +10,14 @@ class Attack(ABC):
         self.data_loader = data_loader
         self.early_stopping = early_stopping # -1=disabled 
 
+        assert self.data_loader.batch_size == 1
+
         self.success = 0
         self.failed = 0
         self.total = 0
         self.adversarial_examples = []
         
     def attack(self, attack_parameters):
-        assert data_loader.batch_size == 1
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
             x, y_true = [x.cuda() for x in data]
