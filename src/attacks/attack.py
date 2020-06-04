@@ -14,6 +14,7 @@ class Attack(ABC):
         
     def attack(self, model, data_loader, attack_parameters):
         assert data_loader.batch_size == 1
+        print('hi')
 
         for i, data in tqdm(list(enumerate(data_loader,0)), position=0):
             x, y_true = [x.cuda() for x in data]
