@@ -3,7 +3,7 @@ import torch.nn.functional as F
 
 class FGSM(Attack):
     
-    def attackSample(self, model, x, y, epsilon, num_iter=1):
+    def attackSample(self, model, x, y, epsilon=0):
         x.requires_grad = True
         
         loss = F.nll_loss(model(x), y)
