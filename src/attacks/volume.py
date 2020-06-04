@@ -20,6 +20,6 @@ class VolumeAttack(Attack):
             loss.backward()
 
             a = a + epsilon * a.grad.data
-            a = clamp(lower, upper).detach()
+            a = a.clamp(lower, upper).detach()
 
         return (a * x).clamp(-1, 1)
