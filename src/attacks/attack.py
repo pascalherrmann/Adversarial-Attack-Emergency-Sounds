@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-import torch
 from tqdm import tqdm
+import torch
 
 class Attack(ABC):
     
@@ -16,15 +16,17 @@ class Attack(ABC):
         self.success = 0
         self.failed = 0
         self.totalAttacked = 0
+        self.totalProcessed = 0
         self.adversarial_examples = []
         
     def attack(self):
-        assert self.totalAttacked == 0 # only attack once
+        assert self.totalProcessed == 0 # only attack once
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
             x, y_true = [x.cuda() for x in data]
             y_initial = self.predictClass(x)
 
+            self.totalProcessed += 1
             if y_initial != y_true:
                 continue # we only attack correctly classified samples (TPs and TNs)  
 
@@ -32,7 +34,7 @@ class Attack(ABC):
             y_perturbed = self.predictClass(x_perturbed)
 
             self.evaluateAttack(i, y_perturbed, y_initial)
-            
+
             if self.early_stopping <= self.success:
                 print("Early stopping")
                 return
