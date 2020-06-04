@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 
 from tqdm import tqdm
 import torch
@@ -30,23 +31,32 @@ class Attack(ABC):
             if y_initial != y_true:
                 continue # we only attack correctly classified samples (TPs and TNs)  
 
-            x_perturbed = self.attackSample(x, y_true, **self.attack_parameters)
+            x_perturbed = self.attackSample(x.clone(), y_true, **self.attack_parameters)
             y_perturbed = self.predictClass(x_perturbed)
 
-            self.evaluateAttack(i, y_perturbed, y_initial)
+            self.evaluateAttack(i, x, x_perturbed, y_perturbed, y_initial)
 
             if self.early_stopping <= self.success:
                 print("Early stopping")
                 return
 
-    def evaluateAttack(self, i, y_perturbed, y_initial):
+    def evaluateAttack(self, i, x, x_perturbed, y_perturbed, y_initial):
         self.totalAttacked += 1
         
         if y_perturbed == y_initial:
             self.failed += 1
         else:
             self.success += 1
-            self.adversarial_examples.append(i)
+            adversarial_example = (i, y_initial, y_perturbed, x, x_perturbed)
+            self.adversarial_examples.append(adversarial_example)
+
+    def showAdversarialExample(target_class=0)
+        allOfOneClass = [s for s in self.adversarial_example if s[1]==target_class]
+        random_sample = random.sample(allOfOneClass)
+        original = random_sample[-2]
+        adversarial = random_sample[-1]
+        ipd.display(ipd.Audio(original,    rate=FIXED_SAMPLE_RATE, normalize=False))
+        ipd.display(ipd.Audio(adversarial, rate=FIXED_SAMPLE_RATE, normalize=False))
     
     def predictClass(self, x):
         self.model.eval().cuda()
