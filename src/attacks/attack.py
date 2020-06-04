@@ -21,13 +21,13 @@ class Attack(ABC):
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
             x, y_true = [x.cuda() for x in data]
-            y_initial = self.predictClass(model, x)
+            y_initial = self.predictClass(x)
 
             if y_initial != y_true:
                 continue # we only attack correctly classified samples (TPs and TNs)  
 
-            x_perturbed = self.attackSample(model, x, y_true, **attack_parameters)
-            y_perturbed = self.predictClass(model, x_perturbed)
+            x_perturbed = self.attackSample(x, y_true, **attack_parameters)
+            y_perturbed = self.predictClass(x_perturbed)
 
             self.evaluateAttack(i, y_perturbed, y_initial)
             
