@@ -57,8 +57,8 @@ class Attack(ABC):
             print("not enough adversarial samples for this class")
             return 
         random_sample = random.sample(allOfOneClass,1)[0]
-        original = random_sample[-2]
-        adversarial = random_sample[-1]
+        original = random_sample[-2].cpu()
+        adversarial = random_sample[-1].cpu()
         ipd.display(ipd.Audio(original,    rate=sr, normalize=False))
         ipd.display(ipd.Audio(adversarial, rate=sr, normalize=False))
     
