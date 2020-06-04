@@ -52,7 +52,7 @@ class Attack(ABC):
 
     def showAdversarialExample(self, target_class=0):
         allOfOneClass = [s for s in self.adversarial_examples if s[1]==target_class]
-        random_sample = random.sample(allOfOneClass)
+        random_sample = random.sample(allOfOneClass,1)[0]
         original = random_sample[-2]
         adversarial = random_sample[-1]
         ipd.display(ipd.Audio(original,    rate=FIXED_SAMPLE_RATE, normalize=False))
