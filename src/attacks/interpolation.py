@@ -14,7 +14,7 @@ class InterpolationAttack(Attack):
         - clamping parameters lowerX, upperX (4 in total):
              define the max/min of interpolation volume
     '''
-    def insertion_attack(self, x, y, overlay_sound, epsilon=0, num_iter=1,
+    def attackSample(self, x, y, overlay_sound, epsilon=0, num_iter=1,
                                lower1=0.8, upper1=1, lower2=0.05, upper2=0.1):
 
         a = torch.tensor(1.0).cuda()  # original sound volume (alpha)
