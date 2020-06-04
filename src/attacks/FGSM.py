@@ -1,4 +1,4 @@
-import Attack
+import .Attack
 
 class FGSM(Attack):
     
