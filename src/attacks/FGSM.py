@@ -1,4 +1,4 @@
-from attacks import Attack
+from attacks.Attack import Attack
 
 class FGSM(Attack):
     
