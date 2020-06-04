@@ -1,3 +1,5 @@
+import Attack
+
 class FGSM(Attack):
     
     def attackSample(self, model, x, y, epsilon, num_iter=1):
