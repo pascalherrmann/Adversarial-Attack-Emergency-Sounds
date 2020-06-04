@@ -5,12 +5,12 @@ from tqdm import tqdm
 
 class Attack(ABC):
     
-    def __init__(self):
+    def __init__(self, early_stopping=-1):
         self.success = 0
         self.failed = 0
         self.total = 0
         self.adversarial_examples = []
-        self.early_stopping = -1 # disabled 
+        self.early_stopping = early_stopping # -1=disabled 
         
     def attack(self, model, data_loader, attack_parameters):
         assert data_loader.batch_size == 1
