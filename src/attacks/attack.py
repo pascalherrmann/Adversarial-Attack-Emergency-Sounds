@@ -15,11 +15,11 @@ class Attack(ABC):
 
         self.success = 0
         self.failed = 0
-        self.total = 0
+        self.totalAttacked = 0
         self.adversarial_examples = []
         
     def attack(self):
-        assert self.total == 0 # only attack once
+        assert self.totalAttacked == 0 # only attack once
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
             x, y_true = [x.cuda() for x in data]
@@ -38,7 +38,7 @@ class Attack(ABC):
                 return
 
     def evaluateAttack(self, i, y_perturbed, y_initial):
-        self.total += 1
+        self.totalAttacked += 1
         
         if y_perturbed == y_initial:
             self.failed += 1
