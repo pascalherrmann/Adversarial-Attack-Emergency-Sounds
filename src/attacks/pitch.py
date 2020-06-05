@@ -39,6 +39,7 @@ class PitchAttack(Attack):
         y_shift = resample(self.time_stretch(sample, rate)) # not diff'able
         
         # back to original size
+        max_length = sample.shape[0]
         low = int((y_shift.shape[0] - max_length)/2)
         return y_shift[low:low+max_length]
 
