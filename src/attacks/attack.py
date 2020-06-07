@@ -25,7 +25,7 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            x, sr, y_true = [x.cuda() for x in data]
+            x, y_true = [x.cuda() for x in data]
             y_initial = self.predictClass(x)
 
             self.totalProcessed += 1
