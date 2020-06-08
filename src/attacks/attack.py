@@ -25,7 +25,7 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            data = [item.to(device) for item in data] # move to gpu
+            data = [item.cuda() for item in data] # move to gpu
             x, y_true = data[:3], data[-1]
             y_initial = self.predictClass(batch)
 
