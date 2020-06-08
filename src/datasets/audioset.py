@@ -1,7 +1,10 @@
 import os
 import pickle
+import torch
 import torch.utils.data as data
-
+from torchvision import transforms
+from .custom_transforms import ToTensorAudio
+import numpy as np
 
 
 class Audioset(data.Dataset):
@@ -21,15 +24,32 @@ class Audioset(data.Dataset):
     """
     def __init__(self, 
                 pickle_folder_path="/nfs/students/summer-term-2020/project-4/data/dataset1/dataset_resampled",
-                split_mode='train', transforms=None):
+                split_mode='training',
+                fixed_padding = True,
+                transforms=transforms.Compose([ToTensorAudio()])):
+        """
+        Input:
+            pickle_folder_path: str, folder which has `training.p` and `validation.p`
+            split_mode='training': 'training' or 'validation'
+            fixed_padding = Zero padding to self.max_length_sample which is the longest seq in training, validation dataset.
+
+                            Pytorch RNN's use torch.rnn.pad_sequence and does padding based on max len of batch.
+                            !! If you want to use RNN, set `fixed_padding=False` and set argument of dataloader as
+                            `dataloader(collate_fn=dataset.pad_seq)`
+
+            transforms: see custom_transforms.py to add new one
+        """
+        
+        self.max_length_sample = 481489 # Will be used for padding
         self.pickle_path = pickle_folder_path
         if split_mode == 'training':
             self.pickle_path = os.path.join(pickle_folder_path, "training.p")
         elif split_mode == 'validation':
             self.pickle_path = os.path.join(pickle_folder_path, "validation.p")      
-
-        self.whole_data = pickle.load(open(self.pickle_path, 'rb'))
+        self.fixed_padding = fixed_padding
         self.transforms = transforms
+        
+        self.whole_data = pickle.load(open(self.pickle_path, 'rb'))
         
 
     def __len__(self):
@@ -40,7 +60,12 @@ class Audioset(data.Dataset):
         seqs, sample_rate = instance['data']
         label = instance['binary_class']
         label = 1 if label == 'positive' else 0
-        data = seqs, sample_rate
+        data = [seqs, sample_rate]
+        
+        # TODO: Should it be after transforms?
+        if self.fixed_padding:
+            data[0] = np.pad(data[0], [0, self.max_length_sample - len(data[0])])
+        
         
         if self.transforms is not None:
             # !! If sample rate is changed during transforms, make sure you return it
@@ -67,6 +92,8 @@ class Audioset(data.Dataset):
         seqs_pad = torch.nn.utils.rnn.pad_sequence(seqs, batch_first=True, padding_value=0)
         #seqs_pad = seqs_pad_t.transpose(0,1)
         return seqs_pad, lengths, srs, labels
+    
+    
 
 if __name__ == '__main__':
     pass
