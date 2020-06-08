@@ -44,8 +44,9 @@ class AudioCRNN(BaseModel):
         return torch.where(lengths > 0, lengths, torch.tensor(1, device=lengths.device))
 
     def forward(self, batch):    
-        # x-> (batch, time, channel)
         x, lengths, _ = batch # unpacking seqs, lengths and srs
+        # x-> (batch, time, channel)
+        x = x.unsqueeze(2) # add channel dim
         # x-> (batch, channel, time)
         xt = x.float().transpose(1,2)
         # xt -> (batch, channel, freq, time)
