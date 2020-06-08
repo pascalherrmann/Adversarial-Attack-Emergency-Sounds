@@ -33,7 +33,7 @@ class Attack(ABC):
             if y_initial != y_true:
                 continue # we only attack correctly classified samples (TPs and TNs)  
 
-            x_perturbed = self.attackSample(x.clone(), y_true, **self.attack_parameters)
+            x_perturbed = self.attackSample(x, y_true, **self.attack_parameters)
             y_perturbed = self.predictClass(x_perturbed)
 
             self.evaluateAttack(i, x, x_perturbed, y_perturbed, y_initial)
