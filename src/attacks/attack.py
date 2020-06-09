@@ -87,8 +87,10 @@ class Attack(ABC):
 
     def cpu(self):
         for sample in self.adversarial_examples:
-            sample[-1].cpu()
-            sample[-2].cpu()
+                sample[1] = sample[1].cpu()
+                sample[2] = sample[2].cpu()
+                sample[3] = [x.cpu() for x in sample[3]]
+                sample[4] = [x.cpu() for x in sample[4]]
         return self
 
     @abstractmethod
