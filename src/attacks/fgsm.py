@@ -12,11 +12,11 @@ class FGSM(Attack):
         loss.backward()
 
         if norm == "inf":
-            x = x + epsilon * x.grad.data.sign()
+            x[0] = x[0] + epsilon * x[0].grad.data.sign()
         else:
             normed_grad = x.grad.data.norm(p=float(norm), dim=[2,3]).unsqueeze(2).unsqueeze(3)
-            x = x + epsilon * x.grad.data/normed_grad
+            x[0] = x[0] + epsilon * x.grad.data/normed_grad
 
         # projection in case epsilon is too large
-        x = x.clamp(-1, 1).detach()  
+        x[0] = x[0].clamp(-1, 1).detach()  
         return x
