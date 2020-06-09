@@ -49,7 +49,9 @@ class Attack(ABC):
             self.failed += 1
         else:
             self.success += 1
-            adversarial_example = (i, y_initial, y_perturbed, x, x_perturbed)
+            adversarial_example = (i, y_initial.cpu(), y_perturbed.cpu(),
+                                    [item.cpu() for item in x],
+                                    [item.cpu() for item in x_perturbed])
             self.adversarial_examples.append(adversarial_example)
 
     def showAdversarialExample(self, target_class=0):
@@ -84,14 +86,6 @@ class Attack(ABC):
         assert self.totalProcessed > 0
         # attack_failed = model still correct
         return self.failed/float(self.totalProcessed)
-
-    def cpu(self):
-        for sample in self.adversarial_examples:
-                sample[1] = sample[1].cpu()
-                sample[2] = sample[2].cpu()
-                sample[3] = [x.cpu() for x in sample[3]]
-                sample[4] = [x.cpu() for x in sample[4]]
-        return self
 
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
