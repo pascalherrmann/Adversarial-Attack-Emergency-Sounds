@@ -22,4 +22,6 @@ class VolumeAttack(Attack):
             a = a + epsilon * a.grad.data
             a = a.clamp(lower, upper).detach()
 
+        print(a)
+
         return [(a * x[0]).clamp(-1, 1), x[1]]
