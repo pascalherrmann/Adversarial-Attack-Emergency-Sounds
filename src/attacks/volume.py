@@ -19,7 +19,7 @@ class VolumeAttack(Attack):
             self.model.zero_grad()
             loss.backward()
 
-            # some models cannobt backpropagate/are robust by default
+            # some models cannot backpropagate/are robust by default
             assert not torch.isnan(a.grad.data)
 
             a = a + epsilon * a.grad.data

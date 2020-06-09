@@ -30,7 +30,10 @@ class InterpolationAttack(Attack):
             self.model.zero_grad()
             loss.backward()
 
-        a = (a + epsilon * a.grad.data).clamp(lower1, upper1).detach()
-        b = (b + epsilon * b.grad.data).clamp(lower2, upper2).detach()
+            assert not torch.isnan(a.grad.data)
+            assert not torch.isnan(b.grad.data)
+
+            a = (a + epsilon * a.grad.data).clamp(lower1, upper1).detach()
+            b = (b + epsilon * b.grad.data).clamp(lower2, upper2).detach()
 
         return [(a * x[0] + b * overlay_sound).clamp(-1, 1), x[1]]
