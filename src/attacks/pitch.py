@@ -15,14 +15,14 @@ class PitchAttack(Attack):
         stretching_rate > 1 means speedup
         stretching_rate > 1 means slowdown
     """
-    def attackSample(self, x, y, sr, num_iter=1, lower=1, upper=5):
+    def attackSample(self, x, y, num_iter=1, lower=1, upper=5):
         n_steps_search_range = torch.arange(lower, upper, (upper-lower)/num_iter)
         losses = []
         stretched_inputs = []
         
         with torch.no_grad():
             for n_steps in n_steps_search_range:
-                stretched = self.pitch_shift(x.squeeze(), sr, n_steps)
+                stretched = self.pitch_shift(x[0].squeeze(), sr=x[1], n_steps)
                 stretched = stretched.unsqueeze(0)
             stretched_inputs.append(stretched)
             losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
