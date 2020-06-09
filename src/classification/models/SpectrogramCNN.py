@@ -22,6 +22,7 @@ class SpectrogramCNN(nn.Module):
         self.fc2 = nn.Linear(50, 2)
 
     def forward(self, x):
+        x, _ = x
         x = torch.stft(x, self.windowsize, window=self.window).pow(2).sum(3).sqrt()
         x = x.unsqueeze(1).float()
         x = self.bn0(x)
