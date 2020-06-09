@@ -38,7 +38,7 @@ class Attack(ABC):
 
             self.evaluateAttack(i, x, x_perturbed, y_perturbed, y_initial)
 
-            if self.early_stopping >= self.success && self.early_stopping > 0:
+            if self.early_stopping <= self.success && self.early_stopping > 0:
                 print("Early stopping")
                 return
 
