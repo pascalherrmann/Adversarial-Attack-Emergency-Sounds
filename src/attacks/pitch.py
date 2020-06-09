@@ -7,14 +7,7 @@ import math
 import torch
 
 class PitchAttack(Attack):
-    
-    """
-        lower: lower bound for streching rate 
-        upper: upper bound for streching rate
 
-        stretching_rate > 1 means speedup
-        stretching_rate > 1 means slowdown
-    """
     def attackSample(self, x, y, num_iter=1, lower=1, upper=5):
         n_steps_search_range = torch.arange(lower, upper, (upper-lower)/num_iter)
         losses = []
@@ -27,7 +20,7 @@ class PitchAttack(Attack):
             stretched_inputs.append(stretched)
             losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
-        return stretched_inputs[best_rate],clamp(-1,1), x[1]
+        return stretched_inputs[best_rate].clamp(-1,1), x[1]
 
     def pitch_shift(self, sample, sr, n_steps, bins_per_octave=12): 
         # https://librosa.github.io/librosa/_modules/librosa/effects.html#pitch_shift
@@ -35,8 +28,8 @@ class PitchAttack(Attack):
         rate = 2.0 ** (-float(n_steps) / bins_per_octave)
 
         # Stretch in time, then resample, compare librosa
-        resample = torchaudio.transforms.Resample(float(sr)/rate, sr).cuda()
-        y_shift = resample(self.time_stretch(sample, rate)) # not diff'able
+        resample = torchaudio.transforms.Resample(float(sr.cpu())/rate, sr.cpu()).cpu()
+        y_shift = resample(self.time_stretch(sample, rate).cpu()).cuda() # not diff'able
         
         # back to original size
         max_length = sample.shape[0]
