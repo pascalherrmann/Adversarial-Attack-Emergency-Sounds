@@ -5,23 +5,26 @@ import torch.nn.functional as F
 import torchaudio
 import math
 import torch
+import librosa
 
 class PitchAttack(Attack):
 
-    def attackSample(self, x, y, num_iter=1, lower=1, upper=5):
+    def attackSample(self, x, y, num_iter=1, lower=-2, upper=2):
         n_steps_search_range = torch.arange(lower, upper, (upper-lower)/num_iter)
         losses = []
         stretched_inputs = []
         
         with torch.no_grad():
             for n_steps in n_steps_search_range:
-                stretched = self.pitch_shift(x[0].squeeze(), sr=x[1], n_steps=n_steps)
-                stretched = stretched.unsqueeze(0)
+                stretched = librosa.effects.pitch_shift(x[0].squeeze().cpu().numpy(), sr=x[1], n_steps=n_steps)
+                stretched = torch.tensor(stretched).unsqueeze(0).cuda()
                 stretched_inputs.append(stretched)
                 losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
         return stretched_inputs[best_rate].clamp(-1,1), x[1]
 
+    ''' alternatively (but also non-differentiable) TODO: Debug shape to original size
+    
     def pitch_shift(self, sample, sr, n_steps, bins_per_octave=12): 
         # https://librosa.github.io/librosa/_modules/librosa/effects.html#pitch_shift
         assert bins_per_octave >= 1
@@ -31,9 +34,7 @@ class PitchAttack(Attack):
         resample = torchaudio.transforms.Resample(float(sr.cpu())/rate, sr.cpu()).cpu()
         y_shift = resample(self.time_stretch(sample, rate).cpu()).cuda() # not diff'able
         
-        # back to original size
-        max_length = sample.shape[0]
-        low = int((y_shift.shape[0] - max_length)/2)
+        # todo back to original size
         return y_shift[low:low+max_length]
 
     """
@@ -56,3 +57,5 @@ class PitchAttack(Attack):
         # time stretch via phase_vocoder (not differentiable):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         return AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
+        
+    '''
