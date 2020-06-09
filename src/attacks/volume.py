@@ -15,11 +15,14 @@ class VolumeAttack(Attack):
         for i in range(num_iter):
             a.requires_grad_()
 
-            loss = F.nll_loss(self.model(a * x), y)
+            loss = F.nll_loss(self.model([a * x[0], x[1]]), y)
             self.model.zero_grad()
             loss.backward()
+
+            # some models cannot backpropagate/are robust by default
+            assert not torch.isnan(a.grad.data)
 
             a = a + epsilon * a.grad.data
             a = a.clamp(lower, upper).detach()
 
-        return (a * x).clamp(-1, 1)
+        return [(a * x[0]).clamp(-1, 1), x[1]]

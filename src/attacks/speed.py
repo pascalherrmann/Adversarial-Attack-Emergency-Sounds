@@ -12,7 +12,7 @@ class TimeStretchAttack(Attack):
         upper: upper bound for streching rate
 
         stretching_rate > 1 means speedup
-        stretching_rate > 1 means slowdown
+        stretching_rate < 1 means slowdown
     """
     def attackSample(self, x, y, num_iter=1, lower=0.9, upper=1.1):
         rate_search_range = torch.arange(lower, upper, (upper-lower)/num_iter)
@@ -21,12 +21,12 @@ class TimeStretchAttack(Attack):
 
         with torch.no_grad():
             for rate in rate_search_range:
-                stretched = self.time_stretch(x.squeeze().cpu(), rate)
-                stretched = stretched.cuda().unsqueeze(0)
+                stretched = self.time_stretch(x[0].squeeze(), rate)
+                stretched = stretched.unsqueeze(0)
             stretched_inputs.append(stretched)
-            losses.append(F.nll_loss(self.model(stretched), y))
+            losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
-        return stretched_inputs[best_rate]
+        return [stretched_inputs[best_rate].clamp(-1,1), x[1]]
 
     """
         Time stretching with padding
@@ -44,7 +44,7 @@ class TimeStretchAttack(Attack):
 
         # time stretch
         stft = torch.stft(sample, n_fft.item(), hop_length=hop_length).unsqueeze(0)
-        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None]
+        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].cuda()
         # time stretch via phase_vocoder (not differentiable):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()

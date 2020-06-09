@@ -25,19 +25,20 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            x, y_true = [x.cuda() for x in data]
+            data = [item.cuda() for item in data] # move to gpu
+            x, y_true = data[:2], data[-1]
             y_initial = self.predictClass(x)
 
             self.totalProcessed += 1
             if y_initial != y_true:
                 continue # we only attack correctly classified samples (TPs and TNs)  
 
-            x_perturbed = self.attackSample(x.clone(), y_true, **self.attack_parameters)
+            x_perturbed = self.attackSample(x, y_true, **self.attack_parameters)
             y_perturbed = self.predictClass(x_perturbed)
 
             self.evaluateAttack(i, x, x_perturbed, y_perturbed, y_initial)
 
-            if self.early_stopping <= self.success:
+            if self.early_stopping <= self.success and self.early_stopping > 0:
                 print("Early stopping")
                 return
 
@@ -51,16 +52,16 @@ class Attack(ABC):
             adversarial_example = (i, y_initial, y_perturbed, x, x_perturbed)
             self.adversarial_examples.append(adversarial_example)
 
-    def showAdversarialExample(self, sr, target_class=0):
+    def showAdversarialExample(self, target_class=0):
         allOfOneClass = [s for s in self.adversarial_examples if s[1]==target_class]
         if len(allOfOneClass) == 0:
             print("not enough adversarial samples for this class")
             return 
         random_sample = random.sample(allOfOneClass,1)[0]
-        original = random_sample[-2].cpu()
-        adversarial = random_sample[-1].cpu()
-        ipd.display(ipd.Audio(original,    rate=sr, normalize=False))
-        ipd.display(ipd.Audio(adversarial, rate=sr, normalize=False))
+        original = random_sample[-2]
+        adversarial = random_sample[-1]
+        ipd.display(ipd.Audio(original[0].cpu(),    rate=original[1].item(), normalize=True))
+        ipd.display(ipd.Audio(adversarial[0].cpu(), rate=original[1].item(), normalize=False))
     
     def predictClass(self, x):
         self.model.eval().cuda()
@@ -87,6 +88,3 @@ class Attack(ABC):
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
         pass # Implement attack in subclass
-
-if __name__ == '__main__':
-    pass
