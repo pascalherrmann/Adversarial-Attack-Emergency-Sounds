@@ -19,12 +19,10 @@ class VolumeAttack(Attack):
             self.model.zero_grad()
             loss.backward()
 
-            print(a)
-            print(a.grad.data)
+            # some models cannobt backpropagate/are robust by default
+            assert not torch.isnan(a.grad.data)
 
             a = a + epsilon * a.grad.data
             a = a.clamp(lower, upper).detach()
-
-        print(a)
 
         return [(a * x[0]).clamp(-1, 1), x[1]]
