@@ -25,7 +25,7 @@ class PitchAttack(Attack):
                 stretched = self.pitch_shift(x.squeeze().cpu(), sr, n_steps)
                 stretched = stretched.cuda().unsqueeze(0)
             stretched_inputs.append(stretched)
-            losses.append(F.nll_loss(self.model(stretched), y))
+            losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
         return stretched_inputs[best_rate]
 

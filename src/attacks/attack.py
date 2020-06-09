@@ -58,10 +58,10 @@ class Attack(ABC):
             print("not enough adversarial samples for this class")
             return 
         random_sample = random.sample(allOfOneClass,1)[0]
-        original = random_sample[-2].cpu()
-        adversarial = random_sample[-1].cpu()
-        ipd.display(ipd.Audio(original,    rate=sr, normalize=False))
-        ipd.display(ipd.Audio(adversarial, rate=sr, normalize=False))
+        original = random_sample[-2]
+        adversarial = random_sample[-1]
+        ipd.display(ipd.Audio(original[0].cpu(),    rate=original[1], normalize=False))
+        ipd.display(ipd.Audio(adversarial[0].cpu(), rate=original[1], normalize=False))
     
     def predictClass(self, x):
         self.model.eval().cuda()
@@ -88,6 +88,3 @@ class Attack(ABC):
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
         pass # Implement attack in subclass
-
-if __name__ == '__main__':
-    pass
