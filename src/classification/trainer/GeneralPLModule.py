@@ -3,9 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
-import src.data.PrepareData as PrepareData
-from src.data.EmergencyDataset import EmergencyDataset
-
 
 class GeneralPLModule(pl.LightningModule):        
     #
@@ -45,8 +42,14 @@ class GeneralPLModule(pl.LightningModule):
     def validation_end(self, outputs):
         avg_loss, acc = self.general_end(outputs, "val")
         print("Val-Acc={}".format(acc))
-        tensorboard_logs = {'val_loss': avg_loss}
+        tensorboard_logs = {'val_loss': avg_loss, 'val_acc': acc}
         return {'val_loss': avg_loss, 'val_acc': acc, 'log': tensorboard_logs} 
+    
+    def trainindg_end(self, outputs):
+        avg_loss, acc = self.general_end(outputs, "train")
+        print("Train-Acc={}".format(acc))
+        tensorboard_logs = {'train_loss': avg_loss, 'train_acc': acc}
+        return {'train_loss': avg_loss, 'train_acc': acc, 'log': tensorboard_logs} 
     
     def general_step(self, batch, batch_idx, mode):
         x, y = batch

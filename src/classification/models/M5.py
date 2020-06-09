@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from src.classification.trainer.GeneralPLModule import GeneralPLModule
-from src.data.PrepareData import PrepareData
-from src.data.EmergencyDataset import EmergencyDataset
-
+import math
+import random
+from classification.trainer.GeneralPLModule import GeneralPLModule
+from datasets.EmergencyDataset import EmergencyDataset
 
 # helper-layer for reshaping
 class PermuteLayer(nn.Module):
@@ -52,14 +51,7 @@ class M5(nn.Module):
 
         scores = scores[0]
         return scores # this output should be of shape [BATCH_SIZE, 2]
-    
-    def prepare_data(self):
-        X_train, y_train, paths_train, X_val, y_val, paths_val = PrepareData.get_preprocessed_data()
-        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
-        self.dataset = {}
-        self.dataset["train"] = EmergencyDataset(X_train, y_train, paths_train, **kwargs)
-        self.dataset["val"] = EmergencyDataset(X_val, y_val, paths_val, **kwargs)
-        
+
         
 class M5PLModule(GeneralPLModule):
 
@@ -67,3 +59,9 @@ class M5PLModule(GeneralPLModule):
         super().__init__(hparams)
         self.hparams.setdefault("p_drop", 0)
         self.model = M5(hparams)
+        
+    def prepare_data(self):
+        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
+        self.dataset = {}
+        self.dataset["train"] = EmergencyDataset("train", **kwargs)
+        self.dataset["val"] = EmergencyDataset("val", **kwargs)

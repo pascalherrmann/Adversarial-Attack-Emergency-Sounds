@@ -1,3 +1,8 @@
+checkpoints
+saved_models
+*/lightning_logs/*
+lightning_logs
+*.pt
 *.h5
 *.png
 *.jpg
