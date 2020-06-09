@@ -35,7 +35,7 @@ class PitchAttack(Attack):
         rate = 2.0 ** (-float(n_steps) / bins_per_octave)
 
         # Stretch in time, then resample, compare librosa
-        resample = torchaudio.transforms.Resample(float(sr)/rate, sr)
+        resample = torchaudio.transforms.Resample(float(sr)/rate, sr).cuda()
         y_shift = resample(self.time_stretch(sample, rate)) # not diff'able
         
         # back to original size
