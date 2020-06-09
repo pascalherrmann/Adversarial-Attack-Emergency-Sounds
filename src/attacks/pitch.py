@@ -22,7 +22,7 @@ class PitchAttack(Attack):
         
         with torch.no_grad():
             for n_steps in n_steps_search_range:
-                stretched = self.pitch_shift(x[0].squeeze(), sr=x[1], n_steps)
+                stretched = self.pitch_shift(x[0].squeeze(), sr=x[1], n_steps=n_steps)
                 stretched = stretched.unsqueeze(0)
             stretched_inputs.append(stretched)
             losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
