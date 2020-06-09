@@ -85,12 +85,11 @@ class Attack(ABC):
         # attack_failed = model still correct
         return self.failed/float(self.totalProcessed)
 
-    def cpu():
+    def cpu(self):
         for sample in self.adversarial_examples:
             sample[-1].cpu()
             sample[-2].cpu()
         return self
-
 
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
