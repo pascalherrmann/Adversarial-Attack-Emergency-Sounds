@@ -17,8 +17,8 @@ class PitchAttack(Attack):
             for n_steps in n_steps_search_range:
                 stretched = self.pitch_shift(x[0].squeeze(), sr=x[1], n_steps=n_steps)
                 stretched = stretched.unsqueeze(0)
-            stretched_inputs.append(stretched)
-            losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
+                stretched_inputs.append(stretched)
+                losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
         return stretched_inputs[best_rate].clamp(-1,1), x[1]
 
