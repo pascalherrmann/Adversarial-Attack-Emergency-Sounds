@@ -26,7 +26,7 @@ class TimeStretchAttack(Attack):
             stretched_inputs.append(stretched)
             losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
-        return stretched_inputs[best_rate]
+        return [stretched_inputs[best_rate], x[1]]
 
     """
         Time stretching with padding
