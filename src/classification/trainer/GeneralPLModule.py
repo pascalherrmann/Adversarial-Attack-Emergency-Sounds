@@ -1,4 +1,6 @@
 import pytorch_lightning as pl
+import random
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,6 +17,8 @@ class GeneralPLModule(pl.LightningModule):
         # set hyperparams
         self.hparams = hparams
         self.model = None
+        self.attack_fn = False
+        self.attack_args = {}
 
     # set self.dataset["train"] , self.dataset["val"] 
     '''
@@ -56,6 +60,9 @@ class GeneralPLModule(pl.LightningModule):
 
         # load X, y to device!
         x, y = x.to(self.device), y.to(self.device)
+        
+        if mode == "train" and self.attack_fn: # create adversarial sample.
+            x = self.attack_fn(self.model, x, y, **self.attack_args)
 
         # forward pass
         scores = self.model.forward(x) # should be of shape [batch_size, 2]
