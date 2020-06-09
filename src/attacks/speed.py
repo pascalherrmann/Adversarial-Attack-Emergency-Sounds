@@ -24,7 +24,7 @@ class TimeStretchAttack(Attack):
                 stretched = self.time_stretch(x[0].squeeze().cpu(), rate)
                 stretched = stretched.cuda().unsqueeze(0)
             stretched_inputs.append(stretched)
-            losses.append(F.nll_loss(self.model([stretched, x[1]), y))
+            losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
         return stretched_inputs[best_rate]
 
