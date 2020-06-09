@@ -52,7 +52,7 @@ class Attack(ABC):
             adversarial_example = (i, y_initial, y_perturbed, x, x_perturbed)
             self.adversarial_examples.append(adversarial_example)
 
-    def showAdversarialExample(self, sr, target_class=0):
+    def showAdversarialExample(self, target_class=0):
         allOfOneClass = [s for s in self.adversarial_examples if s[1]==target_class]
         if len(allOfOneClass) == 0:
             print("not enough adversarial samples for this class")
@@ -60,8 +60,8 @@ class Attack(ABC):
         random_sample = random.sample(allOfOneClass,1)[0]
         original = random_sample[-2]
         adversarial = random_sample[-1]
-        ipd.display(ipd.Audio(original[0].cpu(),    rate=original[1], normalize=False))
-        ipd.display(ipd.Audio(adversarial[0].cpu(), rate=original[1], normalize=False))
+        ipd.display(ipd.Audio(original[0].cpu(),    rate=original[1].item(), normalize=False))
+        ipd.display(ipd.Audio(adversarial[0].cpu(), rate=original[1].item(), normalize=False))
     
     def predictClass(self, x):
         self.model.eval().cuda()
