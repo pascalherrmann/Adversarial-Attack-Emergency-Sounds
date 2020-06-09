@@ -26,7 +26,7 @@ class InterpolationAttack(Attack):
             a.requires_grad_()
             b.requires_grad_()
 
-            loss = F.nll_loss(self.model([a * x[0] + b * overlay_sound, x[1]), y)
+            loss = F.nll_loss(self.model([a * x[0] + b * overlay_sound, x[1]]), y)
             self.model.zero_grad()
             loss.backward()
 
