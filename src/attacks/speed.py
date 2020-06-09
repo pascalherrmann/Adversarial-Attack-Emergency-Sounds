@@ -12,7 +12,7 @@ class TimeStretchAttack(Attack):
         upper: upper bound for streching rate
 
         stretching_rate > 1 means speedup
-        stretching_rate > 1 means slowdown
+        stretching_rate < 1 means slowdown
     """
     def attackSample(self, x, y, num_iter=1, lower=0.9, upper=1.1):
         rate_search_range = torch.arange(lower, upper, (upper-lower)/num_iter)
@@ -26,7 +26,7 @@ class TimeStretchAttack(Attack):
             stretched_inputs.append(stretched)
             losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
-        return [stretched_inputs[best_rate], x[1]]
+        return [stretched_inputs[best_rate].clamp(-1,1), x[1]]
 
     """
         Time stretching with padding

@@ -22,12 +22,12 @@ class PitchAttack(Attack):
         
         with torch.no_grad():
             for n_steps in n_steps_search_range:
-                stretched = self.pitch_shift(x.squeeze().cpu(), sr, n_steps)
-                stretched = stretched.cuda().unsqueeze(0)
+                stretched = self.pitch_shift(x.squeeze(), sr, n_steps)
+                stretched = stretched.unsqueeze(0)
             stretched_inputs.append(stretched)
             losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
         best_rate = torch.stack(losses).argmax().item()
-        return stretched_inputs[best_rate]
+        return stretched_inputs[best_rate],clamp(-1,1), x[1]
 
     def pitch_shift(self, sample, sr, n_steps, bins_per_octave=12): 
         # https://librosa.github.io/librosa/_modules/librosa/effects.html#pitch_shift
@@ -59,7 +59,7 @@ class PitchAttack(Attack):
 
         # time stretch
         stft = torch.stft(sample, n_fft.item(), hop_length=hop_length).unsqueeze(0)
-        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None]
+        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].cuda()
         # time stretch via phase_vocoder (not differentiable):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         return AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
