@@ -56,7 +56,7 @@ class DeepRecursiveCNN(nn.Module):
         return x
     
     def forward(self, batch):
-        x0, _, _ = batch
+        x0, _ = batch
         batch_size = x0.shape[0]
         
         ## first normalize batch

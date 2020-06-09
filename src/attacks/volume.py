@@ -19,6 +19,9 @@ class VolumeAttack(Attack):
             self.model.zero_grad()
             loss.backward()
 
+            print(a)
+            print(a.grad.data)
+
             a = a + epsilon * a.grad.data
             a = a.clamp(lower, upper).detach()
 
