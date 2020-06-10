@@ -53,8 +53,8 @@ class Attack(ABC):
         else:
             self.success += 1
             adversarial_example = (i, y_initial.cpu(), y_perturbed.cpu(),
-                                    [item.cpu() for item in x],
-                                    [item.cpu() for item in x_perturbed])
+                                    {k: x[k].cpu() for k in x},
+                                    {k: x[k].cpu() for k in x_perturbed})
             self.adversarial_examples.append(adversarial_example)
 
     def showAdversarialExample(self, target_class=0):
