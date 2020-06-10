@@ -56,7 +56,7 @@ class DeepRecursiveCNN(nn.Module):
         return x
     
     def forward(self, batch):
-        x0= batch['audio']
+        x0 = batch['audio']
         batch_size = x0.shape[0]
         
         ## first normalize batch

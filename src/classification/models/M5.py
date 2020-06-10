@@ -39,8 +39,8 @@ class M5(nn.Module):
             nn.Linear(512, 2)
         )
         
-    def forward(self, x):
-        x  = x[0]
+    def forward(self, batch):
+        x  = batch['audio']
         if len(x.shape) == 2:
             x = torch.unsqueeze(x, 1)  # if [batch_size, 80000] make it to [batch_size, 1, 8000]
 

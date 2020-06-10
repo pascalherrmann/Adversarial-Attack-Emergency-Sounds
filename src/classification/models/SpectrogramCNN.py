@@ -21,8 +21,8 @@ class SpectrogramCNN(nn.Module):
         self.fc1 = nn.Linear(5100, 50)
         self.fc2 = nn.Linear(50, 2)
 
-    def forward(self, x):
-        x, _ = x
+    def forward(self, batch):
+        x = batch['audio']
         x = torch.stft(x, self.windowsize, window=self.window).pow(2).sum(3).sqrt()
         x = x.unsqueeze(1).float()
         x = self.bn0(x)
