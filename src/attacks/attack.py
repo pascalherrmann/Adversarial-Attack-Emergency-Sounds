@@ -24,9 +24,11 @@ class Attack(ABC):
     def attack(self):
         assert self.totalProcessed == 0 # only attack once
 
-        for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
+        for i, batch in tqdm(list(enumerate(self.data_loader,0)), position=0):
+            # actually we don't handle batch now, but we will
+            # TODO: allow attacks on whole batch for speedup
             x = {k: batch[k].cuda() for k in ['audio', 'sample_rate']}
-            y_true = batch['label'].cuda()
+            y_true = batch['label'].cuda() 
 
             y_initial = self.predictClass(x)
 
