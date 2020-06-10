@@ -21,12 +21,16 @@ class TimeStretchAttack(Attack):
 
         with torch.no_grad():
             for rate in rate_search_range:
-                stretched = self.time_stretch(x[0].squeeze(), rate)
+                stretched = self.time_stretch(x['audio'].squeeze(), rate)
                 stretched = stretched.unsqueeze(0)
-            stretched_inputs.append(stretched)
-            losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
+                stretched_inputs.append(stretched)
+                x_pert = {'audio': stretched, 'sample_rate': x['sample_rate']}
+                losses.append(F.nll_loss(self.model(x_pert), y))
         best_rate = torch.stack(losses).argmax().item()
-        return [stretched_inputs[best_rate].clamp(-1,1), x[1]]
+        
+        x_pert = {'audio': stretched_inputs[best_rate].clamp(-1, 1)}
+        x_pert['sample_rate'] = x['sample_rate']
+        return x_pert
 
     """
         Time stretching with padding

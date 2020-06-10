@@ -16,12 +16,18 @@ class PitchAttack(Attack):
         
         with torch.no_grad():
             for n_steps in n_steps_search_range:
-                stretched = librosa.effects.pitch_shift(x[0].squeeze().cpu().numpy(), sr=x[1], n_steps=n_steps)
+                stretched = librosa.effects.pitch_shift(x['audio'].squeeze().cpu().numpy(),
+                                                        sr=x['sample_rate'], n_steps=n_steps)
                 stretched = torch.tensor(stretched).unsqueeze(0).cuda()
                 stretched_inputs.append(stretched)
-                losses.append(F.nll_loss(self.model([stretched, x[1]]), y))
+                x_pert = {'audio': stretched, 'sample_rate': x['sample_rate']}
+                losses.append(F.nll_loss(self.model(x_pert), y))
         best_rate = torch.stack(losses).argmax().item()
-        return stretched_inputs[best_rate].clamp(-1,1), x[1]
+
+        x_pert = {'audio': stretched_inputs[best_rate].clamp(-1, 1)}
+        x_pert['sample_rate'] = x['sample_rate']
+        return x_pert
+
 
     ''' alternatively (but also non-differentiable) TODO: Debug shape to original size
     

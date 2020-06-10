@@ -25,8 +25,9 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, data in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            batch = [item.cuda() for item in data] # move to gpu
-            x, y_true = {k: batch[k] for k in ['data', 'sample_rate']}, batch['label']
+            x = {k: batch[k].cuda() for k in ['audio', 'sample_rate']}
+            y_true = batch['label'].cuda()
+
             y_initial = self.predictClass(x)
 
             self.totalProcessed += 1

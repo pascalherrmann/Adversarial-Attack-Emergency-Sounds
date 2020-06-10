@@ -15,7 +15,8 @@ class VolumeAttack(Attack):
         for i in range(num_iter):
             a.requires_grad_()
 
-            loss = F.nll_loss(self.model([a * x[0], x[1]]), y)
+            x_pert = {'audio': a * x['audio'], 'sample_rate': x['sample_rate']}
+            loss = F.nll_loss(self.model(x_pert), y)
             self.model.zero_grad()
             loss.backward()
 
@@ -25,4 +26,4 @@ class VolumeAttack(Attack):
             a = a + epsilon * a.grad.data
             a = a.clamp(lower, upper).detach()
 
-        return [(a * x[0]).clamp(-1, 1), x[1]]
+        return {'audio': (a * x['audio']).clamp(-1, 1), 'sample_rate': x['sample_rate']}

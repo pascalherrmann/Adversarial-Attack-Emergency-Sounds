@@ -26,7 +26,8 @@ class InterpolationAttack(Attack):
             a.requires_grad_()
             b.requires_grad_()
 
-            loss = F.nll_loss(self.model([a * x[0] + b * overlay_sound, x[1]]), y)
+            x_pert = {'audio': a * x['audio'] + b * overlay_sound, 'sample_rate': x[1]}
+            loss = F.nll_loss(self.model(x_pert), y)
             self.model.zero_grad()
             loss.backward()
 
@@ -36,4 +37,6 @@ class InterpolationAttack(Attack):
             a = (a + epsilon * a.grad.data).clamp(lower1, upper1).detach()
             b = (b + epsilon * b.grad.data).clamp(lower2, upper2).detach()
 
-        return [(a * x[0] + b * overlay_sound).clamp(-1, 1), x[1]]
+            x_pert = {'audio': (a * x['audio'] + b * overlay_sound).clamp(-1, 1)}
+            x_pert['sample_rate']: x['sample_rate']
+        return x_pert
