@@ -9,7 +9,7 @@ import librosa
 
 class PitchAttack(Attack):
 
-    def attackSample(self, x, y, num_iter=1, lower=-2, upper=2):
+    def attackSample(self, x, y, num_iter=1, lower=-1, upper=1):
         n_steps_search_range = torch.arange(lower, upper, (upper-lower)/num_iter)
         losses = []
         stretched_inputs = []
