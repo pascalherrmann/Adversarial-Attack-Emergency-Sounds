@@ -15,9 +15,13 @@ class Audioset(data.Dataset):
         transform: PyTorch transformations
     
     Output:
-        audio: Raw audio signal on time domain
-        sr: Sample rate
-        label: 1 if labeled as siren, else 0
+        By default returns a dict with keys
+        {
+            'audio' : `Raw audio signal on time domain, transforms applied if any.` (N, T)
+            'sample_rate': sample rate for each instance (N)
+            'label': `1 if labeled as siren, else 0` (N)
+        }
+
 
     Further explanation about how dataset is obtained
     https://wiki.tum.de/pages/viewpage.action?spaceKey=mllab&title=4%3A+Datasets
@@ -56,23 +60,32 @@ class Audioset(data.Dataset):
         return len(self.whole_data)
 
     def __getitem__(self, index):
+        final_data = {
+            'audio' : None,
+            'sample_rate': None,
+            'label': None
+        }
+        
         instance = self.whole_data[index]
         seqs, sample_rate = instance['data']
         label = instance['binary_class']
         label = 1 if label == 'positive' else 0
-        data = [seqs, sample_rate]
         
         # TODO: Should it be after transforms?
         if self.fixed_padding:
-            data[0] = np.pad(data[0], [0, self.max_length_sample - len(data[0])])
+            seqs = np.pad(seqs, [0, self.max_length_sample - len(seqs)])
         
         
         if self.transforms is not None:
             # !! If sample rate is changed during transforms, make sure you return it
-            audio, sr = self.transforms(data)
-            return audio, sr, label
+            seqs, sample_rate = self.transforms([seqs, sample_rate])
+            
+        
+        final_data['label'] = label
+        final_data['audio'] = seqs
+        final_data['sample_rate'] = sample_rate
 
-        return data[0], data[1], label # raw audio signal, sample rate, label
+        return final_data
 
         
 
@@ -82,6 +95,8 @@ class Audioset(data.Dataset):
         Get the batch and sort across samples according to length
         """
         # sort_ind should point to length
+
+        batch = [(i['audio'], i['sample_rate'], i['label']) for i in batch]
         sort_ind = 0
         sorted_batch = sorted(batch, key=lambda x: x[0].size(sort_ind), reverse=True)
         seqs, srs, labels = zip(*sorted_batch)
@@ -91,7 +106,13 @@ class Audioset(data.Dataset):
         # seqs_pad -> (batch, time, channel) 
         seqs_pad = torch.nn.utils.rnn.pad_sequence(seqs, batch_first=True, padding_value=0)
         #seqs_pad = seqs_pad_t.transpose(0,1)
-        return seqs_pad, lengths, srs, labels
+        
+        final_data = {
+            'audio': seqs_pad,
+            'lengths': lengths,
+            'label': labels
+        }
+        return final_data
     
     
 
