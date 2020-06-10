@@ -26,7 +26,7 @@ class EmergencyDataset(Dataset):
         self.X, self.y, self.paths = load_preprocessed_data_from_cache(mode = mode)
         
     def __getitem__(self, index):
-        return self.X[index], 8000, self.y[index]
+        return {'audio': self.X[index], 'sample_rate': 8000, 'label': self.y[index]}
     
     def __len__(self):
         return len(self.X)
