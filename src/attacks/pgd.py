@@ -7,7 +7,7 @@ class PGD(Attack):
 
     def __init__(self, model, data_loader,
                     attack_parameters, early_stopping=-1,
-                    device='cuda', save_samples=True
+                    device='cuda', save_samples=True):
 
         self.fga=FastGradientAttack(model, data_loader,
                                     attack_parameters, early_stopping=early_stopping,
