@@ -12,6 +12,8 @@ class FastGradientAttack(Attack):
     def attackSample(self, x, y, epsilon=0, norm='inf', loss_fn=F.nll_loss):
         x['audio'].requires_grad_()
         
+        print(x['audio'].shape)
+        print(y.shape)
         loss = loss_fn(self.model(x), y)
         self.model.zero_grad()
         loss.backward()
