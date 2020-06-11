@@ -35,6 +35,8 @@ class Attack(ABC):
             samples_to_attack = (y_initial == y_true)
             y_initial = y_initial[samples_to_attack]
             y_true = y_true[samples_to_attack]
+            print(x['audio'].shape)
+            print(x['audio'][samples_to_attack].shape)
             x_to_perturb = {k: x[k][samples_to_attack] for k in x}
             x_to_perturb['audio'] = x['audio'].clone() # preserve original sample
 
