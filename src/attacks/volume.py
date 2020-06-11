@@ -10,6 +10,7 @@ class VolumeAttack(Attack):
         upper: upper bound for volume increase 
     """
     def attackSample(self, x, y, lower=0.2, upper=2, epsilon=0, num_iter=1):
+        raise Exception("Not vectorized - TODO")
         a = torch.tensor(1.0).cuda()
 
         for i in range(num_iter):

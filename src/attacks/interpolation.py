@@ -17,7 +17,7 @@ class InterpolationAttack(Attack):
     '''
     def attackSample(self, x, y, overlay_sound, epsilon=0, num_iter=1,
                                lower1=0.8, upper1=1, lower2=0.05, upper2=0.1):
-
+        raise Exception("Not vectorized - TODO")
         a = torch.tensor(1.0).cuda()  # original sound volume (alpha)
         b = torch.tensor(1.0).cuda()  # inserted sound volume (beta)
         overlay_sound = overlay_sound.cuda()

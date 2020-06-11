@@ -8,12 +8,15 @@ import torch
 
 class Attack(ABC):
     
-    def __init__(self, model, data_loader, attack_parameters, early_stopping=-1, device='cuda'):
+    def __init__(self, model, data_loader,
+                    attack_parameters, early_stopping=-1,
+                    device='cuda', save_samples=True):
         self.model = model
         self.data_loader = data_loader
         self.attack_parameters = attack_parameters
         self.early_stopping = early_stopping # -1=disabled 
         self.device = device
+        self.save_samples = save_samples
 
         self.success = 0
         self.failed = 0
@@ -60,6 +63,9 @@ class Attack(ABC):
         self.failed += (y_perturbed == y_initial).sum().item()
         self.success += (y_perturbed != y_initial).sum().item()
 
+        if not self.save_samples:
+            return # don't save s
+
         batch_adversarial_examples = [ \
             ( # shift examples to cpu (otherwise dumps GPU)
                 y_initial[i].cpu(),
@@ -73,6 +79,9 @@ class Attack(ABC):
         self.adversarial_examples.extend(batch_adversarial_examples)
 
     def showAdversarialExample(self, target_class=0):
+        if not self.save_samples:
+            raise Exception("you don't save adversarial examples currently")
+
         allOfOneClass = [s for s in self.adversarial_examples if s[0]==target_class]
         if len(allOfOneClass) == 0:
             print("not enough adversarial samples for this class")
