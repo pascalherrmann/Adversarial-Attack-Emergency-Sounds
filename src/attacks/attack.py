@@ -56,9 +56,9 @@ class Attack(ABC):
         self.success += (y_perturbed != y_initial).sum()
 
         batch_adversarial_examples = [ \
-            (
+            ( # shift examples to cpu (otherwise dumps GPU)
                 y_initial[i].cpu(),
-                y_perturbed[i].cpu()
+                y_perturbed[i].cpu(),
                 {k: x[k][i].cpu() for k in x},
                 {k: x_perturbed[k][i].cpu() for k in x_perturbed}
             ) for i in range(y_perturbed.size(0)) \
