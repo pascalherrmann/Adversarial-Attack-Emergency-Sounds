@@ -25,8 +25,8 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, batch in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            x = {k: batch[k].to(device) for k in batch if k != 'label'}
-            y_true = batch['label'].to(device)
+            x = {k: batch[k].to(self.device) for k in batch if k != 'label'}
+            y_true = batch['label'].to(self.device)
 
             y_initial = self.predictClass(x)
             self.totalProcessed += y_initial.size(0)
@@ -37,7 +37,7 @@ class Attack(ABC):
                 continue # no correct classified sample in this batch
             x = {k: batch[k][samples_to_attack] for k in batch}
             y_initial = y_initial[samples_to_attack]
-            y_true = y_true[samples_to_attack].to(device)
+            y_true = y_true[samples_to_attack].to(self.device)
 
             # preserve original sample
             x_to_perturb = {k: x[k].clone().to(self.device) for k in x}
