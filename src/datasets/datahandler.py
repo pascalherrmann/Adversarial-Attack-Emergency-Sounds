@@ -1,4 +1,4 @@
-from .audioset import Audioset
+from .audioset import AudioSet
 from .EmergencyDataset import EmergencyDataset
 
 '''
