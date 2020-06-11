@@ -55,10 +55,17 @@ class Attack(ABC):
         self.failed += (y_perturbed == y_initial).sum()
         self.success += (y_perturbed != y_initial).sum()
 
-            adversarial_example = (i, y_initial.cpu(), y_perturbed.cpu(),
-                                    {k: x[k].cpu() for k in x},
-                                    {k: x[k].cpu() for k in x_perturbed})
-            self.adversarial_examples.append(adversarial_example)
+        batch_adversarial_examples = [ \
+            (
+                y_initial[i].cpu(),
+                y_perturbed[i].cpu()
+                {k: x[k][i].cpu() for k in x},
+                {k: x_perturbed[k][i].cpu() for k in x_perturbed}
+            ) for i in range(y_perturbed.size(0)) \
+              if (y_perturbed != y_initial)[i] \
+            ]
+
+        self.adversarial_examples.extend(batch_adversarial_examples)
 
     def showAdversarialExample(self, target_class=0):
         allOfOneClass = [s for s in self.adversarial_examples if s[1]==target_class]
