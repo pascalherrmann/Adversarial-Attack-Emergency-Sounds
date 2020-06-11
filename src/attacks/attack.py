@@ -34,11 +34,14 @@ class Attack(ABC):
             # we only attack correctly classified samples (TPs and TNs)  
             samples_to_attack = (y_initial == y_true)
             if len(batch['audio']) == 1 and samples_to_attack.sum() == 0:
-                continue
+                continue # no correct classified sample in this batch
+            x = {k: batch[k][samples_to_attack] for k in batch}
             y_initial = y_initial[samples_to_attack]
             y_true = y_true[samples_to_attack]
-            x_to_perturb = {k: x[k][samples_to_attack] for k in x}
-            x_to_perturb['audio'] = x_to_perturb['audio'].clone() # preserve original sample
+
+            # preserve original sample
+            x_to_perturb = {k: x[k] for k in x}
+            x_to_perturb['audio'] = x['audio'].clone() 
 
             # perform actual attack
             x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
