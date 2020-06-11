@@ -20,9 +20,7 @@ class ProjectedGradientDescent(Attack):
             if norm == "inf":
                 x['audio'] = x['audio'] + epsilon * x['audio'].grad.sign()
             else:
-                print(x['audio'].grad.shape)
                 normed_grad = x['audio'].grad.norm(p=float(norm), dim=[1]).unsqueeze(1)
-                print(normed_grad.shape)
                 x['audio'] = x['audio'] + epsilon * x['audio'].grad/normed_grad
 
             # projection in case epsilon is too large
