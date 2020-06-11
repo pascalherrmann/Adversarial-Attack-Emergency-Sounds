@@ -15,8 +15,6 @@ class Attack(ABC):
         self.early_stopping = early_stopping # -1=disabled 
         self.device = device
 
-        assert self.data_loader.batch_size == 1
-
         self.success = 0
         self.failed = 0
         self.totalAttacked = 0
