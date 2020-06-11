@@ -52,8 +52,8 @@ class Attack(ABC):
     def evaluateAttack(self, i, x, x_perturbed, y_perturbed, y_initial):
         self.totalAttacked += y_perturbed.size(0)
         
-        self.failed += (y_perturbed == y_initial).sum()
-        self.success += (y_perturbed != y_initial).sum()
+        self.failed += (y_perturbed == y_initial).sum().item()
+        self.success += (y_perturbed != y_initial).sum().item()
 
         batch_adversarial_examples = [ \
             ( # shift examples to cpu (otherwise dumps GPU)
