@@ -29,17 +29,20 @@ class Attack(ABC):
             y_true = batch['label'].to(self.device) 
 
             y_initial = self.predictClass(x)
-
-            self.totalProcessed += 1
+            self.totalProcessed += y_initial.size(0)
 
             # we only attack correctly classified samples (TPs and TNs)  
-            samples_to_attack = y_initial != y_true
-
+            samples_to_attack = (y_initial == y_true)
+            y_initial = y_initial[samples_to_attack]
+            y_true = y_true[samples_to_attack]
             x_to_perturb = {k: x[k][samples_to_attack] for k in x}
             x_to_perturb['audio'] = x['audio'].clone() # preserve original sample
-            x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
-            y_perturbed = self.predictClass(x_perturbed)
 
+            # perform actual attack
+            x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
+
+            # evaluate attack
+            y_perturbed = self.predictClass(x_perturbed)
             self.evaluateAttack(i, x, x_perturbed, y_perturbed, y_initial)
 
             if self.early_stopping <= self.success and self.early_stopping > 0:
@@ -47,12 +50,11 @@ class Attack(ABC):
                 return
 
     def evaluateAttack(self, i, x, x_perturbed, y_perturbed, y_initial):
-        self.totalAttacked += 1
+        self.totalAttacked += y_perturbed.size(0)
         
-        if y_perturbed == y_initial:
-            self.failed += 1
-        else:
-            self.success += 1
+        self.failed += (y_perturbed == y_initial).sum()
+        self.success += (y_perturbed != y_initial).sum()
+
             adversarial_example = (i, y_initial.cpu(), y_perturbed.cpu(),
                                     {k: x[k].cpu() for k in x},
                                     {k: x[k].cpu() for k in x_perturbed})
