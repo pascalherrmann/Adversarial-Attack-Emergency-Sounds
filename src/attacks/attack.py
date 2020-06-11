@@ -73,7 +73,7 @@ class Attack(ABC):
         self.adversarial_examples.extend(batch_adversarial_examples)
 
     def showAdversarialExample(self, target_class=0):
-        allOfOneClass = [s for s in self.adversarial_examples if s[1]==target_class]
+        allOfOneClass = [s for s in self.adversarial_examples if s[0]==target_class]
         if len(allOfOneClass) == 0:
             print("not enough adversarial samples for this class")
             return 
