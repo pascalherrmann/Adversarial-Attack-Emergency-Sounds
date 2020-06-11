@@ -24,5 +24,5 @@ class ProjectedGradientDescent(Attack):
             x['audio'] = x['audio'] + epsilon * x.grad/normed_grad
 
             # projection in case epsilon is too large
-                x['audio'] = x['audio'].clamp(-1, 1).detach()
+            x['audio'] = x['audio'].clamp(-1, 1).detach()
         return x
