@@ -6,6 +6,8 @@ import random
 from classification.trainer.GeneralPLModule import GeneralPLModule
 from datasets.EmergencyDataset import EmergencyDataset
 
+from torch.utils.data import DataLoader
+
 # helper-layer for reshaping
 class PermuteLayer(nn.Module):
     def __init__(self, *args):

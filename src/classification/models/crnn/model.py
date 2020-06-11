@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .base_model import BaseModel
 
+from torch.utils.data import DataLoader
+
 # F.max_pool2d needs kernel_size and stride. If only one argument is passed, 
 # then kernel_size = stride
 
