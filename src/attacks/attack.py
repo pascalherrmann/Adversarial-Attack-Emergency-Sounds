@@ -33,7 +33,7 @@ class Attack(ABC):
             self.totalProcessed += 1
 
             # we only attack correctly classified samples (TPs and TNs)  
-            samples_to_attack = y_initial != y_true:
+            samples_to_attack = y_initial != y_true
 
             x_to_perturb = {k: x[k][samples_to_attack] for k in x}
             x_to_perturb['audio'] = x['audio'].clone() # preserve original sample
