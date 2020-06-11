@@ -53,6 +53,16 @@ class M5(nn.Module):
         scores = scores[0]
         return scores # this output should be of shape [BATCH_SIZE, 2]
 
+    def getDatasetInfo(self):
+        dataset_type = {"sample_rate": 8000}
+        dataset_params = {}
+        return dataset_type, dataset_params
+    
+    def setDataset(self, split_mode, dataset):
+        self.datasets[split_mode] = dataset
+        
+    def getDataLoader(self, split_mode, **params):
+        return DataLoader(self.datasets[split_mode], **params)
         
 class M5PLModule(GeneralPLModule):
 

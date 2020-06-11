@@ -1,10 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 
 class SpectrogramCNN(nn.Module):
+    
     def __init__(self):
         super(SpectrogramCNN, self).__init__()
+        self.datasets = {}
         
         self.windowsize = 2048
         self.window = torch.hann_window(self.windowsize).cuda()
@@ -33,5 +36,15 @@ class SpectrogramCNN(nn.Module):
         x = x.view(-1, 5100)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-
         return F.log_softmax(x,dim=1)
+    
+    def getDatasetInfo(self):
+        dataset_type = {"sample_rate": 48000}
+        dataset_params = {"fixed_padding": True}
+        return dataset_type, dataset_params
+    
+    def setDataset(self, split_mode, dataset):
+        self.datasets[split_mode] = dataset
+        
+    def getDataLoader(self, split_mode, **params):
+        return DataLoader(self.datasets[split_mode], **params)

@@ -84,6 +84,17 @@ class AudioCRNN(BaseModel):
             max_ind = out.argmax().item()        
             return self.classes[max_ind], out[:,max_ind].item()
 
+    def getDatasetInfo(self):
+        dataset_type = {"sample_rate": 48000}
+        dataset_params = {"fixed_padding": False}
+        return dataset_type, dataset_params
+    
+    def setDataset(self, split_mode, dataset):
+        self.datasets[split_mode] = dataset
+        
+    def getDataLoader(self, split_mode, **params):
+        dataset = self.datasets[split_mode]
+        return DataLoader(dataset, collate_fn=dataset.pad_seq, **params)
 
 class AudioCNN(AudioCRNN):
 

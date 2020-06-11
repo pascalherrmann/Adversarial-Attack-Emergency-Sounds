@@ -1,10 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 
 class DeepRecursiveCNN(nn.Module):
     def __init__(self, hidden_dim=100, numChunksList=[5,2,1]):
         super(DeepRecursiveCNN, self).__init__()
+        self.datasets={}
         
         self.hidden_dim = hidden_dim 
         
@@ -80,5 +82,13 @@ class DeepRecursiveCNN(nn.Module):
 
         return F.log_softmax(x,dim=1)
 
-if __name__ == '__main__':
-    pass
+    def getDatasetInfo(self):
+        dataset_type = {"sample_rate": 48000}
+        dataset_params = {"fixed_padding": True}
+        return dataset_type, dataset_params
+    
+    def setDataset(self, split_mode, dataset):
+        self.datasets[split_mode] = dataset
+    
+    def getDataLoader(self, split_mode, **params):
+        return DataLoader(self.datasets[split_mode], **params)

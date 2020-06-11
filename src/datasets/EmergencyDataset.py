@@ -7,10 +7,11 @@ import config
 To create the .pt-files from scratch (i.e., run whole pre-processing pipeline: cropping/padding, normalizing, downsampling, etc.): run the file `lib dat dat`a PrepareData.py` in branch `pascal_lib`
 '''
 
-def load_preprocessed_data_from_cache(mode = "train"):
+def load_preprocessed_data_from_cache(mode = "training"):
     
     directory = config.DATA_8K_DIR
     print("Loading cached {} data from {}".format(mode, directory))
+
     
     X     = torch.load(os.path.join( directory, "X_{}.pt".format(mode) ) )
     y     = torch.load(os.path.join( directory, "y_{}.pt".format(mode) ) ) 
@@ -20,8 +21,15 @@ def load_preprocessed_data_from_cache(mode = "train"):
 
 class EmergencyDataset(Dataset):
     
-    def __init__(self, mode = "train"):
-        
+    def __init__(self, mode = "training"):
+        # TODO refactor:
+        if mode == "training":
+            mode = "train"
+        elif mode == "validation":
+            mode = "val"
+        elif mode == "testing":
+            mode = "test"
+
         assert mode in ["train", "val", "test"]
         self.X, self.y, self.paths = load_preprocessed_data_from_cache(mode = mode)
         

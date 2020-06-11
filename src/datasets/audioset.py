@@ -7,7 +7,7 @@ from .custom_transforms import ToTensorAudio
 import numpy as np
 
 
-class Audioset(data.Dataset):
+class AudioSet(data.Dataset):
     """
     Input: 
         pickle_folder_path: Folder which has training.p and validation.p
@@ -114,7 +114,3 @@ class Audioset(data.Dataset):
         }
         return final_data
     
-    
-
-if __name__ == '__main__':
-    pass
