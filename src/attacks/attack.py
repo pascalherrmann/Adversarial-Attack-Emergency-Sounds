@@ -33,6 +33,8 @@ class Attack(ABC):
 
             # we only attack correctly classified samples (TPs and TNs)  
             samples_to_attack = (y_initial == y_true)
+            if len(batch['audio']) == 1 and samples_to_attack.sum() == 0:
+                continue
             y_initial = y_initial[samples_to_attack]
             y_true = y_true[samples_to_attack]
             x_to_perturb = {k: x[k][samples_to_attack] for k in x}
