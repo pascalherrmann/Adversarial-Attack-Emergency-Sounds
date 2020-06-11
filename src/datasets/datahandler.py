@@ -34,7 +34,7 @@ class DatasetHandler():
             return
             
         if dataset_type['sample_rate'] == 48000:
-            dataset = Audioset(**dataset_params)
+            dataset = AudioSet(**dataset_params)
         elif dataset_type['sample_rate'] == 8000:
             dataset = EmergencyDataset(**dataset_params)
 
