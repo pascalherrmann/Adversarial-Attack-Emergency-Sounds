@@ -77,8 +77,12 @@ class Attack(ABC):
         random_sample = random.sample(allOfOneClass,1)[0]
         original = random_sample[-2]
         adversarial = random_sample[-1]
-        ipd.display(ipd.Audio(original[0].cpu(),    rate=original[1].item(), normalize=True))
-        ipd.display(ipd.Audio(adversarial[0].cpu(), rate=original[1].item(), normalize=False))
+        ipd.display(ipd.Audio(original['audio'],
+                                rate=original['sample_rate'].item(),
+                                normalize=True))
+        ipd.display(ipd.Audio(adversarial['audio'],
+                                rate=original['sample_rate'].item(),
+                                normalize=False))
     
     def predictClass(self, x):
         self.model.eval().to(self.device)
