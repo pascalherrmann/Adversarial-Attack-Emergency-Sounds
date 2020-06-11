@@ -35,7 +35,8 @@ class Attack(ABC):
             samples_to_attack = (y_initial == y_true)
             if len(batch['audio']) == 1 and samples_to_attack.sum() == 0:
                 continue # no correct classified sample in this batch
-            x = {k: batch[k][samples_to_attack] for k in batch}
+            assert y_true[samples_to_attack] == y_initial[samples_to_attack]
+            x = {k: x[k][samples_to_attack] for k in x}
             y_initial = y_initial[samples_to_attack]
             y_true = y_true[samples_to_attack].to(self.device)
 
@@ -54,8 +55,6 @@ class Attack(ABC):
                 return
 
     def evaluateAttack(self, i, x, x_perturbed, y_perturbed, y_initial):
-        print(y_perturbed)
-        print(y_initial)
         self.totalAttacked += y_perturbed.size(0)
         
         self.failed += (y_perturbed == y_initial).sum().item()
