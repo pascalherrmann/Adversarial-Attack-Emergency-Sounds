@@ -21,13 +21,15 @@ def load_preprocessed_data_from_cache(mode = "training"):
 
 class EmergencyDataset(Dataset):
     
-    def __init__(self, mode = "training"):
+    def __init__(self, mode = "train", split_mode="training"):
+        # initially "mode" was used, thats deprecated now
+        # now we use "split_mode"
         # TODO refactor:
-        if mode == "training":
+        if split_mode == "training":
             mode = "train"
-        elif mode == "validation":
+        elif split_mode == "validation":
             mode = "val"
-        elif mode == "testing":
+        elif split_mode == "testing":
             mode = "test"
 
         assert mode in ["train", "val", "test"]
