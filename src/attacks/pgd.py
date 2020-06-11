@@ -1,20 +1,28 @@
 from attacks.attack import Attack
-from attacks.fga import FastGradientAttack
 
 import torch.nn.functional as F
 
-class PGD(Attack):
-
-    def __init__(self, model, data_loader,
-                    attack_parameters, early_stopping=-1,
-                    device='cuda', save_samples=True):
-
-        self.fga=FastGradientAttack(model, data_loader,
-                                    attack_parameters, early_stopping=early_stopping,
-                                    device=device, save_samples=save_samples)
+class ProjectedGradientDescent(Attack):
     
+    '''
+        - Epsilon step in gradient direction (step size defined by norm)
+        - Fully vectorized 
+        - For num_iter=1 and norm='inf': Degrades to Fast Gradient Sign Method (FGSM)
+    '''
     def attackSample(self, x, y, epsilon=0, num_iter=1, norm='inf', loss_fn=F.nll_loss):
-        raise Exception("Not vectorized - TODO")
-        for i in range(num_iter):
-            x = self.fga.attackSample(x, y, epsilon, norm, loss_fn)
-        return x 
+        for _ in range(num_iter):
+            x['audio'].requires_grad_()
+
+            loss = loss_fn(self.model(x), y)
+            self.model.zero_grad()
+            loss.backward()
+
+            if norm == "inf":
+            x['audio'] = x['audio'] + epsilon * x['audio'].grad.sign()
+            else:
+            normed_grad = x.grad.norm(p=float(norm), dim=[2]).unsqueeze(2)
+            x['audio'] = x['audio'] + epsilon * x.grad/normed_grad
+
+            # projection in case epsilon is too large
+                x['audio'] = x['audio'].clamp(-1, 1).detach()
+        return x
