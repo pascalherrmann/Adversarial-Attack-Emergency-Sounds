@@ -31,10 +31,11 @@ class Attack(ABC):
             y_initial = self.predictClass(x)
 
             self.totalProcessed += 1
-            if y_initial != y_true:
-                continue # we only attack correctly classified samples (TPs and TNs)  
 
-            x_to_perturb = x
+            # we only attack correctly classified samples (TPs and TNs)  
+            samples_to_attack = y_initial != y_true:
+
+            x_to_perturb = {k: x[k][samples_to_attack] for k in x}
             x_to_perturb['audio'] = x['audio'].clone() # preserve original sample
             x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
             y_perturbed = self.predictClass(x_perturbed)
