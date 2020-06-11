@@ -1,5 +1,5 @@
-from datasets.audioset import Audioset
-from datasets.EmergencyDataset import EmergencyDataset
+from .audioset import Audioset
+from .EmergencyDataset import EmergencyDataset
 
 '''
     Model-specific dataset
