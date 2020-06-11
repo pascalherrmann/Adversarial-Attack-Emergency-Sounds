@@ -41,7 +41,7 @@ class Attack(ABC):
 
             # preserve original sample
             x_to_perturb = {k: x[k] for k in x}
-            x_to_perturb['audio'] = x['audio'].clone() 
+            x_to_perturb['audio'] = x['audio'].clone().to(self.device)
 
             # perform actual attack
             x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
