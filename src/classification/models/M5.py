@@ -18,6 +18,7 @@ class PermuteLayer(nn.Module):
 class M5(nn.Module):
     def __init__(self, hparams):
         super(M5, self).__init__()
+        self.datasets = {}
         self.model = nn.Sequential(
             nn.Conv1d(1, 128, 80, 4),
             nn.BatchNorm1d(128),

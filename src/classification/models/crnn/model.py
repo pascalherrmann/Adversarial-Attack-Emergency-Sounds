@@ -13,7 +13,7 @@ from torchparse import parse_cfg
 class AudioCRNN(BaseModel):
     def __init__(self, classes, config={}, state_dict=None):
         super(AudioCRNN, self).__init__(config)
-        
+        self.datasets = {}
         in_chan = 2 if config['transforms']['args']['channels'] == 'stereo' else 1
 
         self.classes = classes
