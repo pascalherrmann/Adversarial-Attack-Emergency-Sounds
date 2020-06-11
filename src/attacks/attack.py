@@ -25,8 +25,8 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, batch in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            x = {k: batch[k] for k in batch if k != 'label'}
-            y_true = batch['label'] 
+            x = {k: batch[k].to(device) for k in batch if k != 'label'}
+            y_true = batch['label'].to(device)
 
             y_initial = self.predictClass(x)
             self.totalProcessed += y_initial.size(0)
