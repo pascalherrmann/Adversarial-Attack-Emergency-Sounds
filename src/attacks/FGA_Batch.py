@@ -13,6 +13,7 @@ def sample_epsilon(lo=1e-4, hi=1):
     log_sample = random.uniform(log_lo, log_hi)
     return 10**log_sample
 
+@DeprecationWarning
 def fast_gradient_attack(model, x, y, epsilon, norm,
                          loss_fn=torch.nn.functional.cross_entropy):
     

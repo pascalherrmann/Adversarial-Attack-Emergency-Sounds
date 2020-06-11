@@ -3,15 +3,17 @@ import random
 
 import IPython.display as ipd
 from tqdm import tqdm
+from copy import deepcopy
 import torch
 
 class Attack(ABC):
     
-    def __init__(self, model, data_loader, attack_parameters, early_stopping=-1):
+    def __init__(self, model, data_loader, attack_parameters, early_stopping=-1, device='cuda'):
         self.model = model
         self.data_loader = data_loader
         self.attack_parameters = attack_parameters
         self.early_stopping = early_stopping # -1=disabled 
+        self.device = device
 
         assert self.data_loader.batch_size == 1
 
@@ -25,10 +27,8 @@ class Attack(ABC):
         assert self.totalProcessed == 0 # only attack once
 
         for i, batch in tqdm(list(enumerate(self.data_loader,0)), position=0):
-            # actually we don't handle batch now, but we will
-            # TODO: allow attacks on whole batch for speedup
-            x = {k: batch[k].cuda() for k in ['audio', 'sample_rate']}
-            y_true = batch['label'].cuda() 
+            x = {k: batch[k].to(self.device) for k in batch}
+            y_true = batch['label'].to(self.device) 
 
             y_initial = self.predictClass(x)
 
@@ -36,7 +36,9 @@ class Attack(ABC):
             if y_initial != y_true:
                 continue # we only attack correctly classified samples (TPs and TNs)  
 
-            x_perturbed = self.attackSample(x, y_true, **self.attack_parameters)
+            x_to_perturb = x
+            x_to_perturb['audio'] = x['audio'].clone() # preserve original sample
+            x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
             y_perturbed = self.predictClass(x_perturbed)
 
             self.evaluateAttack(i, x, x_perturbed, y_perturbed, y_initial)
@@ -69,7 +71,7 @@ class Attack(ABC):
         ipd.display(ipd.Audio(adversarial[0].cpu(), rate=original[1].item(), normalize=False))
     
     def predictClass(self, x):
-        self.model.eval().cuda()
+        self.model.eval().to(self.device)
         return torch.max(self.model(x).data, 1)[1]
 
     def report(self):
@@ -89,7 +91,14 @@ class Attack(ABC):
         assert self.totalProcessed > 0
         # attack_failed = model still correct
         return self.failed/float(self.totalProcessed)
+    
+    def to(device='cuda'):
+        self.device = device
+        return self
 
+    '''
+        - expected to be fully vectorized
+    '''
     @abstractmethod
     def attackSample(self, x, target, **attack_parameters):
         pass # Implement attack in subclass
