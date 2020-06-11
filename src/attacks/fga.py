@@ -19,7 +19,7 @@ class FastGradientAttack(Attack):
         if norm == "inf":
             x['audio'] = x['audio'] + epsilon * x['audio'].grad.sign()
         else:
-            normed_grad = x.grad.norm(p=float(norm), dim=[2,3]).unsqueeze(2).unsqueeze(3)
+            normed_grad = x.grad.norm(p=float(norm), dim=[2]).unsqueeze(2)
             x['audio'] = x['audio'] + epsilon * x.grad/normed_grad
 
         # projection in case epsilon is too large
