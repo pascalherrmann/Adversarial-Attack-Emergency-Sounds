@@ -16,8 +16,7 @@ class GeneralPLModule(pl.LightningModule):
         super().__init__()
         # set hyperparams
         self.hparams = hparams
-        self.attack_fn = False
-        self.attack_args = {}
+        self.attack = None
         self.model = None
 
     # set self.dataset["train"] , self.dataset["val"] 
@@ -55,9 +54,9 @@ class GeneralPLModule(pl.LightningModule):
     
     def general_step(self, batch, batch_idx, mode):
         x, y = batch, batch["label"]
-        
-        if mode == "train" and self.attack_fn: # create adversarial sample.
-            x = self.attack_fn(self.model, x, y, **self.attack_args)
+            
+        if mode == "train" and self.attack:
+            x = self.attack.attackSample(x, y, **self.attack.attack_parameters)
 
         # forward pass
         scores = self.model.forward(x) # should be of shape [batch_size, 2]
@@ -103,6 +102,10 @@ class GeneralPLModule(pl.LightningModule):
     #
     # convenience
     #
+    
+    def setAttack(self, attack_class, attack_args):
+        self.attack = attack_class(self.model, self.val_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
+    
     def report(self, loader=None, attack=None, attack_args=None, log=True):
         self.model.to(self.device)
 
@@ -116,9 +119,7 @@ class GeneralPLModule(pl.LightningModule):
             data = data.to(self.device)
             
             if attack:
-                data = attack(self.model, data, targets.to(self.device), **attack_args)
-
-
+                data = self.attack.attackSample(x = data, y = targets, **self.attack.attack_parameters)
 
             scores = self.model(data)
 
