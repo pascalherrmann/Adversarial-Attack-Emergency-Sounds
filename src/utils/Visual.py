@@ -30,13 +30,13 @@ def showWaveplot(sample, title="", sr = 8000):
     plt.title(title if title else 'Monophonic ')
     
 
-def drawPlot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "", y_label = "", title = ""):
+def drawPlot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "", y_label = "", title = "", save_path=None):
     
     # create an index for each tick position
     xi = list(range(len(x)))
 
     # create plot
-    plt.figure(figsize=(14,8))
+    f = plt.figure(figsize=(14,8))
 
     # y-axis: 
     plt.ylim(0.,1.19)
@@ -52,6 +52,10 @@ def drawPlot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "lab
     plt.legend() 
     plt.xticks(xi)
     plt.show()
+    
+    if save_path:
+        f.savefig(save_path, bbox_inches='tight')
+
     
 #
 # further helpers

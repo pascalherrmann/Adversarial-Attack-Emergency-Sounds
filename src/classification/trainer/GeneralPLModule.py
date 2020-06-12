@@ -15,19 +15,18 @@ class GeneralPLModule(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
         # set hyperparams
+        self.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
         self.hparams = hparams
-        self.model = None
         self.attack_fn = False
         self.attack_args = {}
+        self.model = None
 
     # set self.dataset["train"] , self.dataset["val"] 
     '''
     def prepare_data(self):
-        X_train, y_train, paths_train, X_val, y_val, paths_val = PrepareData.get_preprocessed_data()
-        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
         self.dataset = {}
-        self.dataset["train"] = EmergencyDataset(X_train, y_train, paths_train, **kwargs)
-        self.dataset["val"] = EmergencyDataset(X_val, y_val, paths_val, **kwargs)
+        self.dataset["train"] = ...
+        self.dataset["val"] = ...
     '''
     
     #
@@ -96,7 +95,7 @@ class GeneralPLModule(pl.LightningModule):
     
     def forward(self, x):
         x = self.model(x)
-        return F.log_softmax(x, dim = 2)
+        return x#F.log_softmax(x, dim = 2)
 
     def general_end(self, outputs, mode):
         # average over all batches aggregated during one epoch
@@ -104,3 +103,52 @@ class GeneralPLModule(pl.LightningModule):
         total_correct = torch.stack([x[mode + '_n_correct'] for x in outputs]).sum().cpu().numpy()
         acc = total_correct / len(self.dataset[mode])
         return avg_loss, acc
+    
+    #
+    # convenience
+    #
+    def report(self, loader=None, attack=None, attack_args=None, log=True):
+        self.model.to(self.device)
+
+        tp, fp, tn, fn, correct = 0, 0, 0, 0, 0
+        if not loader: loader = self.val_dataloader()
+
+        self.model.eval()
+
+        for data, targets in loader:
+            data = data.to(self.device)
+            
+            if attack:
+                data = attack(self.model, data, targets.to(self.device), **attack_args)
+
+
+
+            scores = self.model(data)
+
+            preds = scores.argmax(axis=1).cpu()
+
+            correct += preds.eq(targets).sum()
+
+            with torch.no_grad():
+                tp += torch.sum(preds & targets)
+                tn += torch.sum((preds == 0) & (targets == 0))
+                fp += torch.sum(((preds == 1) & (targets == 0)))
+                fn += torch.sum((targets == 1) & (preds == 0))
+
+        tp, fp, tn, fn, correct = tp.numpy(), fp.numpy(), tn.numpy(), fn.numpy(), correct.numpy()
+        acc = (tp + tn) / (fp + fn + tp + tn)
+        prec = tp / (tp + fp)
+        rec = tp / (tp + fn)
+        f1 = 2*(prec*rec)/(prec+rec)
+        p_rate = (tp+fp)/(tp+fp+tn+fn)
+
+        if log:
+            print("Accuracy: \t{:.2f}".format(acc))
+            print('Precision: \t{:.2f}'.format(prec))
+            print('Recall: \t{:.2f}'.format(rec))
+            print('F1-Score: \t{:.2f}'.format(f1))
+            print('\nVAL-ACC: {}/{} ({}%)\n'.format(correct, len(loader.dataset),
+                100. * correct / len(loader.dataset)))
+            print("P-Rate: \t{:.2f}".format(p_rate))
+        
+        return {"tp":tp, "fp":fp, "tn":tn, "fn":fn, "correct":correct, "n":len(loader.dataset), "acc":acc, "prec":prec, "rec":rec, "f1":f1, "attack_args":attack_args, "p_rate":p_rate}
