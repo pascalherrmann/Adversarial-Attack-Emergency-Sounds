@@ -15,7 +15,6 @@ class GeneralPLModule(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
         # set hyperparams
-        self.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
         self.hparams = hparams
         self.attack_fn = False
         self.attack_args = {}
@@ -56,9 +55,6 @@ class GeneralPLModule(pl.LightningModule):
     
     def general_step(self, batch, batch_idx, mode):
         x, y = batch, batch["label"]
-
-        # load X, y to device!
-        x, y = x.to(self.device), y.to(self.device)
         
         if mode == "train" and self.attack_fn: # create adversarial sample.
             x = self.attack_fn(self.model, x, y, **self.attack_args)
