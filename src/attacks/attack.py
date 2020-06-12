@@ -108,6 +108,7 @@ class Attack(ABC):
         print(f"Total processed:\t{self.totalProcessed}\n")
         print(f"Success-Rate: \t\t{round(self.getSuccessRate(), 2)}")
         print(f"Perturbed Accurracy: \t{round(self.getAccuracy(), 2)}")
+        return {"success_rate": self.getSuccessRate()}
     
     def getSuccessRate(self):
         assert self.totalAttacked > 0

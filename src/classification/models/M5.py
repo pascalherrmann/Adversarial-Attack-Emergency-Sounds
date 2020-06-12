@@ -40,7 +40,7 @@ class M5(nn.Module):
         )
         
     def forward(self, x):
-        x.cuda()
+        x  = x['audio']
         if len(x.shape) == 2:
             x = torch.unsqueeze(x, 1)  # if [batch_size, 80000] make it to [batch_size, 1, 8000]
 
@@ -63,13 +63,10 @@ class M5PLModule(GeneralPLModule):
         
     def prepare_data(self):
         kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
+        
         self.dataset = {}
-        self.dataset["train"] = EmergencyDataset("train", **kwargs)
-        self.dataset["val"] = EmergencyDataset("val", **kwargs)
-        
-        
-from attacks.certification.Smoothing import SmoothClassifier
-
+        self.dataset["train"] = EmergencyDataset(split_mode="training", **kwargs)
+        self.dataset["val"] = EmergencyDataset(split_mode="validation", **kwargs)
 
 class BaseM5PLModule(GeneralPLModule):
 
@@ -107,8 +104,5 @@ class BaseM5(M5):
         
     def getDataLoader(self, split_mode, **params):
         return DataLoader(self.datasets[split_mode], **params)
-
-    def forward(self, batch):
-        x  = batch['audio']
 
 '''

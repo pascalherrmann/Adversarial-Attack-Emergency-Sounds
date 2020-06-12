@@ -55,7 +55,7 @@ class GeneralPLModule(pl.LightningModule):
         return {'train_loss': avg_loss, 'train_acc': acc, 'log': tensorboard_logs} 
     
     def general_step(self, batch, batch_idx, mode):
-        x, y = batch
+        x, y = batch, batch["label"]
 
         # load X, y to device!
         x, y = x.to(self.device), y.to(self.device)
@@ -115,7 +115,8 @@ class GeneralPLModule(pl.LightningModule):
 
         self.model.eval()
 
-        for data, targets in loader:
+        for batch in loader:
+            data, targets = batch, batch["label"]
             data = data.to(self.device)
             
             if attack:
