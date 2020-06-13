@@ -10,21 +10,24 @@ class VolumeAttack(Attack):
         upper: upper bound for volume increase 
     """
     def attackSample(self, x, y, lower=0.2, upper=2, epsilon=0, num_iter=1):
-        raise Exception("Not vectorized - TODO")
-        a = torch.tensor(1.0).cuda()
 
-        for i in range(num_iter):
+        a = torch.ones(x['audio'].size(0)).unsqueeze(1).cuda()
+
+        for _ in range(num_iter):
             a.requires_grad_()
 
-            x_pert = {'audio': a * x['audio'], 'sample_rate': x['sample_rate']}
-            loss = F.nll_loss(self.model(x_pert), y)
+            tmp_audio = x['audio']
+            x['audio'] = (a * x['audio']).clamp(-1, 1)
+            loss = F.nll_loss(self.model(x), y)
             self.model.zero_grad()
             loss.backward()
 
-            # some models cannot backpropagate/are robust by default
-            assert not torch.isnan(a.grad.data)
+            # we change a absolutely, 
+            # otherwise we would get powers of a (a^num_iter)
+            x['audio'] = tmp_audio 
 
-            a = a + epsilon * a.grad.data
+            a = a + epsilon * a.grad.sign()
             a = a.clamp(lower, upper).detach()
 
-        return {'audio': (a * x['audio']).clamp(-1, 1), 'sample_rate': x['sample_rate']}
+        x['audio'] = (a * x['audio']).clamp(-1, 1)
+        return x 
