@@ -65,10 +65,10 @@ class TimeStretchAttack(Attack):
     def pad_sample(self, istft, max_length, speedup_rate):
         if speedup_rate > 1:
             # faster means output is smaller -> padding
-            pad_l = int((max_length - istft.shape[0])/2)
-            pad_r = max_length - (pad_l + istft.shape[0])
+            pad_l = int((max_length - istft.shape[1])/2)
+            pad_r = max_length - (pad_l + istft.shape[1])
             return F.pad(istft, (pad_l, pad_r))
         else:
             # slower means longer -> chopping of
-            low = int((istft.shape[0] - max_length)/2)
-            return istft[low:low+max_length]
+            low = int((istft.shape[1] - max_length)/2)
+            return istft[:,low:low+max_length]
