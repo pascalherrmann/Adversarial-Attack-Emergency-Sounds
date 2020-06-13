@@ -5,6 +5,7 @@ import math
 import random
 from classification.trainer.GeneralPLModule import GeneralPLModule
 from datasets.EmergencyDataset import EmergencyDataset
+from torch.utils.data import DataLoader
 
 # helper-layer for reshaping
 class PermuteLayer(nn.Module):
@@ -18,6 +19,7 @@ class PermuteLayer(nn.Module):
 class M5(nn.Module):
     def __init__(self, hparams):
         super(M5, self).__init__()
+        self.datasets = {}
         self.model = nn.Sequential(
             nn.Conv1d(1, 128, 80, 4),
             nn.BatchNorm1d(128),
@@ -53,6 +55,16 @@ class M5(nn.Module):
         scores = scores[0]
         return scores # this output should be of shape [BATCH_SIZE, 2]
 
+    def getDatasetInfo(self):
+        dataset_type = {"sample_rate": 8000}
+        dataset_params = {}
+        return dataset_type, dataset_params
+    
+    def setDataset(self, split_mode, dataset):
+        self.datasets[split_mode] = dataset
+        
+    def getDataLoader(self, split_mode, **params):
+        return DataLoader(self.datasets[split_mode], **params)
         
 class M5PLModule(GeneralPLModule):
 
@@ -92,17 +104,3 @@ class BaseM5(M5):
         return super().forward((inputs + noise).clamp(-1, 1))
 
 
-
-'''
-    def getDatasetInfo(self):
-        dataset_type = {"sample_rate": 8000}
-        dataset_params = {}
-        return dataset_type, dataset_params
-    
-    def setDataset(self, split_mode, dataset):
-        self.datasets[split_mode] = dataset
-        
-    def getDataLoader(self, split_mode, **params):
-        return DataLoader(self.datasets[split_mode], **params)
-
-'''
