@@ -1,6 +1,7 @@
 import pytorch_lightning as pl
 import random
 import math
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -98,6 +99,10 @@ class GeneralPLModule(pl.LightningModule):
         total_correct = torch.stack([x[mode + '_n_correct'] for x in outputs]).sum().cpu().numpy()
         acc = total_correct / len(self.dataset[mode])
         return avg_loss, acc
+    
+    def save(self, path):
+        torch.save( {"state_dict": self.model.state_dict(), "hparams": self.hparams, "attack_args": None if not self.attack else self.attack.attack_parameters}, path)
+        print("Saved model to \"{}\"".format(path))
     
     #
     # convenience

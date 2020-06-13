@@ -66,6 +66,7 @@ class RobustnessExperiment():
         self.folder_name = str(self.id).zfill(4) + "_" + self.title
         self.dir = os.path.join(config.EXPERIMENTS_RESULTS_DIR, self.folder_name)
         self.experiment_configs = experiment_configs
+        self.all_results = {}
         create_dir(self.dir)
         
         # back up experiment_configs
@@ -85,7 +86,7 @@ class RobustnessExperiment():
     # shows plot and saves results
     #
     def evaluate_attack(self, model, loader, attack_class, list_attack_args, meta=None, 
-                        results_dir = ".", model_name = "model"):
+                        results_dir = ".", model_name = "model", title = "title"):
         
         current_attack_report = []
         
@@ -107,7 +108,7 @@ class RobustnessExperiment():
             vis_object = [{"data": ys, "color" : "rbgycmk"[0], "label": key_y}]
             drawPlot(x = xs, data = vis_object, x_label = key_x, y_label = key_y, 
                      title = meta["title"] + " | model:" + model_name, 
-                     save_path = os.path.join(results_dir, attack_class.__name__ + ".pdf"))
+                     save_path = os.path.join(results_dir, "plot_{}_{}.pdf".format(title,model_name)))
 
             # write summary file
             info = "Attack: \t" + attack_class.__name__ + "\n"
@@ -116,10 +117,11 @@ class RobustnessExperiment():
             write_to_file(info, os.path.join(self.dir, "summary.txt"))
 
             # save json
-            save_json(current_attack_report, os.path.join(results_dir, attack_class.__name__ + ".json"))
+            save_json(current_attack_report, os.path.join(results_dir, "json_{}_{}.json".format(title,model_name)))
 
+        if title not in self.all_results: self.all_results[title] = {"CONFIGS": list_attack_args}
+        self.all_results[title][model_name] = current_attack_report
         return current_attack_report
-
 
     def run(self, model_path, module_class):
         
@@ -131,7 +133,7 @@ class RobustnessExperiment():
         
         # create sub directory
         model_name = os.path.basename(os.path.normpath(model_path))
-        results_dir = os.path.join(self.dir, model_name)
+        results_dir = self.dir #os.path.join(self.dir, model_name)
         create_dir(results_dir)
         info = ("="*50 + "\n") + "Model: {}\n".format(model_name) + "="*50 + "\n"
         write_to_file(info, os.path.join(self.dir, "summary.txt"))
@@ -145,7 +147,7 @@ class RobustnessExperiment():
             current_attack = exp_conf["attack_fn"]
             current_attack_arg_search_space = exp_conf["attack_arg"]
             meta = exp_conf["meta"]
-            title = current_attack.__name__  if not meta["title"] else meta["title"]
+            title = current_attack.__name__ + "_(Atk#{}_Exp#{})".format(a, self.id)  if not meta["title"] else meta["title"]
             print("Perform Attack #{}/{}: {}".format(a+1, len(self.experiment_configs), title))
         
             # create all possible attack args and run them
@@ -155,4 +157,4 @@ class RobustnessExperiment():
                 
             current_attack_report = self.evaluate_attack(model.model, model.val_dataloader(), 
                                                          current_attack, configs, meta=meta, 
-                                                         results_dir = results_dir, model_name = model_name)
+                                                         results_dir = results_dir, model_name = model_name, title=title)
