@@ -57,11 +57,8 @@ class TimeStretchAttack(Attack):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
 
-        for x_i in range(istft.size(0)):
-            batch[x_i] = self.pad_sample(istft[x_i], batch.size(1), speedup_rate)
-        return batch
+        return  self.pad_sample(istft[x_i], batch.size(1), speedup_rate)
     
-    # this method could be further vectorized
     def pad_sample(self, istft, max_length, speedup_rate):
         if speedup_rate > 1:
             # faster means output is smaller -> padding
