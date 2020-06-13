@@ -6,8 +6,6 @@ import random
 from classification.trainer.GeneralPLModule import GeneralPLModule
 from datasets.EmergencyDataset import EmergencyDataset
 
-from torch.utils.data import DataLoader
-
 # helper-layer for reshaping
 class PermuteLayer(nn.Module):
     def __init__(self, *args):
@@ -20,7 +18,6 @@ class PermuteLayer(nn.Module):
 class M5(nn.Module):
     def __init__(self, hparams):
         super(M5, self).__init__()
-        self.datasets = {}
         self.model = nn.Sequential(
             nn.Conv1d(1, 128, 80, 4),
             nn.BatchNorm1d(128),
@@ -42,8 +39,8 @@ class M5(nn.Module):
             nn.Linear(512, 2)
         )
         
-    def forward(self, batch):
-        x  = batch['audio']
+    def forward(self, x):
+        x  = x['audio']
         if len(x.shape) == 2:
             x = torch.unsqueeze(x, 1)  # if [batch_size, 80000] make it to [batch_size, 1, 8000]
 
@@ -56,6 +53,47 @@ class M5(nn.Module):
         scores = scores[0]
         return scores # this output should be of shape [BATCH_SIZE, 2]
 
+        
+class M5PLModule(GeneralPLModule):
+
+    def __init__(self, hparams):
+        super().__init__(hparams)
+        self.hparams.setdefault("p_drop", 0)
+        self.model = M5(hparams)
+        
+    def prepare_data(self):
+        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
+        
+        self.dataset = {}
+        self.dataset["train"] = EmergencyDataset(split_mode="training", **kwargs)
+        self.dataset["val"] = EmergencyDataset(split_mode="validation", **kwargs)
+
+class BaseM5PLModule(GeneralPLModule):
+
+    def __init__(self, hparams):
+        super().__init__(hparams)
+        self.hparams.setdefault("p_drop", 0)
+        self.model = BaseM5(hparams)
+        
+    def prepare_data(self):
+        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
+        self.dataset = {}
+        self.dataset["train"] = EmergencyDataset("train", **kwargs)
+        self.dataset["val"] = EmergencyDataset("val", **kwargs)
+
+    
+class BaseM5(M5):
+    def __init__(self, hparams):
+        super(BaseM5, self).__init__(hparams)
+        self.sigma = 0.5
+        
+    def forward(self, inputs):
+        noise = torch.randn_like(inputs) * self.sigma
+        return super().forward((inputs + noise).clamp(-1, 1))
+
+
+
+'''
     def getDatasetInfo(self):
         dataset_type = {"sample_rate": 8000}
         dataset_params = {}
@@ -66,16 +104,5 @@ class M5(nn.Module):
         
     def getDataLoader(self, split_mode, **params):
         return DataLoader(self.datasets[split_mode], **params)
-        
-class M5PLModule(GeneralPLModule):
 
-    def __init__(self, hparams):
-        super().__init__(hparams)
-        self.hparams.setdefault("p_drop", 0)
-        self.model = M5(hparams)
-        
-    def prepare_data(self):
-        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
-        self.dataset = {}
-        self.dataset["train"] = EmergencyDataset("train", **kwargs)
-        self.dataset["val"] = EmergencyDataset("val", **kwargs)
+'''

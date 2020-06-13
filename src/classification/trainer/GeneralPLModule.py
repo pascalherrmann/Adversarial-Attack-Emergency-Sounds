@@ -1,10 +1,12 @@
 import pytorch_lightning as pl
 import random
 import math
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
+from utils.Helpers import sample_dict_values
 
 class GeneralPLModule(pl.LightningModule):        
     #
@@ -16,18 +18,15 @@ class GeneralPLModule(pl.LightningModule):
         super().__init__()
         # set hyperparams
         self.hparams = hparams
+        self.attack = None
         self.model = None
-        self.attack_fn = False
-        self.attack_args = {}
 
     # set self.dataset["train"] , self.dataset["val"] 
     '''
     def prepare_data(self):
-        X_train, y_train, paths_train, X_val, y_val, paths_val = PrepareData.get_preprocessed_data()
-        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
         self.dataset = {}
-        self.dataset["train"] = EmergencyDataset(X_train, y_train, paths_train, **kwargs)
-        self.dataset["val"] = EmergencyDataset(X_val, y_val, paths_val, **kwargs)
+        self.dataset["train"] = ...
+        self.dataset["val"] = ...
     '''
     
     #
@@ -56,13 +55,10 @@ class GeneralPLModule(pl.LightningModule):
         return {'train_loss': avg_loss, 'train_acc': acc, 'log': tensorboard_logs} 
     
     def general_step(self, batch, batch_idx, mode):
-        x, y = batch
-
-        # load X, y to device!
-        x, y = x.to(self.device), y.to(self.device)
-        
-        if mode == "train" and self.attack_fn: # create adversarial sample.
-            x = self.attack_fn(self.model, x, y, **self.attack_args)
+        x, y = batch, batch["label"]
+            
+        if mode == "train" and self.attack:
+            x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters))
 
         # forward pass
         scores = self.model.forward(x) # should be of shape [batch_size, 2]
@@ -96,7 +92,7 @@ class GeneralPLModule(pl.LightningModule):
     
     def forward(self, x):
         x = self.model(x)
-        return F.log_softmax(x, dim = 2)
+        return x#F.log_softmax(x, dim = 2)
 
     def general_end(self, outputs, mode):
         # average over all batches aggregated during one epoch
@@ -104,3 +100,59 @@ class GeneralPLModule(pl.LightningModule):
         total_correct = torch.stack([x[mode + '_n_correct'] for x in outputs]).sum().cpu().numpy()
         acc = total_correct / len(self.dataset[mode])
         return avg_loss, acc
+    
+    def save(self, path):
+        torch.save( {"state_dict": self.model.state_dict(), "hparams": self.hparams, "attack_args": None if not self.attack else self.attack.attack_parameters}, path)
+        print("Saved model to \"{}\"".format(path))
+    
+    #
+    # convenience
+    #
+    
+    def setAttack(self, attack_class, attack_args):
+        self.attack = attack_class(self.model, self.val_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
+    
+    def report(self, loader=None, attack=None, attack_args=None, log=True):
+        self.model.to(self.device)
+
+        tp, fp, tn, fn, correct = 0, 0, 0, 0, 0
+        if not loader: loader = self.val_dataloader()
+
+        self.model.eval()
+
+        for batch in loader:
+            data, targets = batch, batch["label"]
+            data = data.to(self.device)
+            
+            if attack:
+                data = self.attack.attackSample(x = data, y = targets, **self.attack.attack_parameters)
+
+            scores = self.model(data)
+
+            preds = scores.argmax(axis=1).cpu()
+
+            correct += preds.eq(targets).sum()
+
+            with torch.no_grad():
+                tp += torch.sum(preds & targets)
+                tn += torch.sum((preds == 0) & (targets == 0))
+                fp += torch.sum(((preds == 1) & (targets == 0)))
+                fn += torch.sum((targets == 1) & (preds == 0))
+
+        tp, fp, tn, fn, correct = tp.numpy(), fp.numpy(), tn.numpy(), fn.numpy(), correct.numpy()
+        acc = (tp + tn) / (fp + fn + tp + tn)
+        prec = tp / (tp + fp)
+        rec = tp / (tp + fn)
+        f1 = 2*(prec*rec)/(prec+rec)
+        p_rate = (tp+fp)/(tp+fp+tn+fn)
+
+        if log:
+            print("Accuracy: \t{:.2f}".format(acc))
+            print('Precision: \t{:.2f}'.format(prec))
+            print('Recall: \t{:.2f}'.format(rec))
+            print('F1-Score: \t{:.2f}'.format(f1))
+            print('\nVAL-ACC: {}/{} ({}%)\n'.format(correct, len(loader.dataset),
+                100. * correct / len(loader.dataset)))
+            print("P-Rate: \t{:.2f}".format(p_rate))
+        
+        return {"tp":tp, "fp":fp, "tn":tn, "fn":fn, "correct":correct, "n":len(loader.dataset), "acc":acc, "prec":prec, "rec":rec, "f1":f1, "attack_args":attack_args, "p_rate":p_rate}

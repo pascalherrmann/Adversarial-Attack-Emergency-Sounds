@@ -100,14 +100,16 @@ class Attack(ABC):
         self.model.eval().to(self.device)
         return torch.max(self.model(x).data, 1)[1]
 
-    def report(self):
-        print(f"Attack-Parameters:\t{self.attack_parameters}")
-        print(f"Early stopping: \t{self.early_stopping > 0} ({self.early_stopping})\n")
-        print(f"Successfully attacked:\t{self.success}")
-        print(f"Total attacked: \t{self.totalAttacked}")
-        print(f"Total processed:\t{self.totalProcessed}\n")
-        print(f"Success-Rate: \t\t{round(self.getSuccessRate(), 2)}")
-        print(f"Perturbed Accurracy: \t{round(self.getAccuracy(), 2)}")
+    def report(self, log=True):
+        if log:
+            print(f"Attack-Parameters:\t{self.attack_parameters}")
+            print(f"Early stopping: \t{self.early_stopping > 0} ({self.early_stopping})\n")
+            print(f"Successfully attacked:\t{self.success}")
+            print(f"Total attacked: \t{self.totalAttacked}")
+            print(f"Total processed:\t{self.totalProcessed}\n")
+            print(f"Success-Rate: \t\t{round(self.getSuccessRate(), 2)}")
+            print(f"Perturbed Accurracy: \t{round(self.getAccuracy(), 2)}")
+        return {"success_rate": self.getSuccessRate(), "acc": self.getAccuracy()}
     
     def getSuccessRate(self):
         assert self.totalAttacked > 0
