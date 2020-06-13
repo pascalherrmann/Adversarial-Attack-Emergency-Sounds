@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
+from utils.Helpers import sample_dict_values
 
 class GeneralPLModule(pl.LightningModule):        
     #
@@ -57,7 +58,7 @@ class GeneralPLModule(pl.LightningModule):
         x, y = batch, batch["label"]
             
         if mode == "train" and self.attack:
-            x = self.attack.attackSample(x, y, **self.attack.attack_parameters)
+            x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters))
 
         # forward pass
         scores = self.model.forward(x) # should be of shape [batch_size, 2]
