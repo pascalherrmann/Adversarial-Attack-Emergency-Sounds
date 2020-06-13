@@ -21,7 +21,7 @@ class VolumeAttack(Attack):
             self.model.zero_grad()
             loss.backward()
 
-            a = a + epsilon * a.grad
+            a = a + epsilon * a.grad.sign()
             a = a.clamp(lower, upper).detach()
 
         x_pert = {'audio': (a * x['audio']).clamp(-1, 1), 'sample_rate': x['sample_rate']}
