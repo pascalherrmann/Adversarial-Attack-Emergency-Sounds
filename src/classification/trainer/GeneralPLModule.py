@@ -97,13 +97,13 @@ class GeneralPLModule(pl.LightningModule):
     #
     
     def setAttack(self, attack_class, attack_args):
-        self.attack = attack_class(self.model, self.val_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
+        self.attack = attack_class(self.model, self.validation_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
     
     def report(self, loader=None, attack=None, attack_args=None, log=True):
         self.model.to(self.device)
 
         tp, fp, tn, fn, correct = 0, 0, 0, 0, 0
-        if not loader: loader = self.val_dataloader()
+        if not loader: loader = self.validation_dataloader()
 
         self.model.eval()
 
@@ -160,5 +160,5 @@ class GeneralPLModule(pl.LightningModule):
         return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"])
 
     @pl.data_loader
-    def val_dataloader(self):
+    def validation_dataloader(self):
         return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"])
