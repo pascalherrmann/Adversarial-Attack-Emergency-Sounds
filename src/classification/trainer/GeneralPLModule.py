@@ -156,7 +156,7 @@ class GeneralPLModule(pl.LightningModule):
         return DataLoader(self.datasets[split_mode], **params)
 
     @pl.data_loader
-    def train_dataloader(self):
+    def training_dataloader(self):
         return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"])
 
     @pl.data_loader
