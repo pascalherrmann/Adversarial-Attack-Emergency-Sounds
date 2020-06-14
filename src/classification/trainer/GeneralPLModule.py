@@ -73,7 +73,7 @@ class GeneralPLModule(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         loss, n_correct = self.general_step(batch, batch_idx, "validation")
-        return {'validation_loss': loss, 'validatino_n_correct': n_correct}
+        return {'validation_loss': loss, 'validation_n_correct': n_correct}
     
 
     
