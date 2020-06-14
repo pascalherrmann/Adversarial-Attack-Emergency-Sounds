@@ -95,13 +95,13 @@ class GeneralPLModule(pl.LightningModule):
     #
     
     def setAttack(self, attack_class, attack_args):
-        self.attack = attack_class(self.model, self.validation_dataloader, attack_args, early_stopping=-1, device='cuda', save_samples=False)
+        self.attack = attack_class(self.model, self.validation_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
     
     def report(self, loader=None, attack=None, attack_args=None, log=True):
         self.model.to(self.device)
 
         tp, fp, tn, fn, correct = 0, 0, 0, 0, 0
-        if not loader: loader = self.validation_dataloader
+        if not loader: loader = self.validation_dataloader()
 
         self.model.eval()
 
