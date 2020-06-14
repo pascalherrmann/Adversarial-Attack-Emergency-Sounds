@@ -36,13 +36,13 @@ class GeneralPLModule(pl.LightningModule):
     # These functions do not need to be modified
     #
     def validation_end(self, outputs):
-        avg_loss, acc = self.general_end(outputs, "val")
+        avg_loss, acc = self.general_end(outputs, "validation")
         print("Val-Acc={}".format(acc))
         tensorboard_logs = {'val_loss': avg_loss, 'val_acc': acc}
         return {'val_loss': avg_loss, 'val_acc': acc, 'log': tensorboard_logs} 
     
     def trainindg_end(self, outputs):
-        avg_loss, acc = self.general_end(outputs, "train")
+        avg_loss, acc = self.general_end(outputs, "training")
         print("Train-Acc={}".format(acc))
         tensorboard_logs = {'train_loss': avg_loss, 'train_acc': acc}
         return {'train_loss': avg_loss, 'train_acc': acc, 'log': tensorboard_logs} 
@@ -50,7 +50,7 @@ class GeneralPLModule(pl.LightningModule):
     def general_step(self, batch, batch_idx, mode):
         x, y = batch, batch["label"]
             
-        if mode == "train" and self.attack:
+        if mode == "training" and self.attack:
             x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters))
 
         # forward pass
@@ -67,12 +67,12 @@ class GeneralPLModule(pl.LightningModule):
         return loss, n_correct
     
     def training_step(self, batch, batch_idx):
-        loss, n_correct = self.general_step(batch, batch_idx, "train")
+        loss, n_correct = self.general_step(batch, batch_idx, "training")
         tensorboard_logs = {'loss': loss}
         return {'loss': loss, 'train_n_correct': n_correct, 'log': tensorboard_logs}
 
     def validation_step(self, batch, batch_idx):
-        loss, n_correct = self.general_step(batch, batch_idx, "val")
+        loss, n_correct = self.general_step(batch, batch_idx, "validation")
         return {'val_loss': loss, 'val_n_correct': n_correct}
     
 
