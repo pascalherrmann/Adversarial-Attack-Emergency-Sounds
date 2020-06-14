@@ -86,8 +86,8 @@ class DeepRecursiveCNN(nn.Module):
 
 class DeepRecursiveCNNPLModule(GeneralPLModule):
 
-    def __init__(self):
-        super().__init__({})
+    def __init__(self, hparams):
+        super().__init__(hparams)
         self.model = DeepRecursiveCNN()
         
     def dataset_info(self):
