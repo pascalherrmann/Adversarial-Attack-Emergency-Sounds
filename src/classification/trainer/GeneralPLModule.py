@@ -20,15 +20,8 @@ class GeneralPLModule(pl.LightningModule):
         self.hparams = hparams
         self.attack = None
         self.model = None
-
-    # set self.dataset["train"] , self.dataset["val"] 
-    '''
-    def prepare_data(self):
         self.dataset = {}
-        self.dataset["train"] = ...
-        self.dataset["val"] = ...
-    '''
-    
+
     #
     # Optional
     #
@@ -82,13 +75,7 @@ class GeneralPLModule(pl.LightningModule):
         loss, n_correct = self.general_step(batch, batch_idx, "val")
         return {'val_loss': loss, 'val_n_correct': n_correct}
     
-    @pl.data_loader
-    def train_dataloader(self):
-        return DataLoader(self.dataset["train"], shuffle=True, batch_size=self.hparams["batch_size"])
 
-    @pl.data_loader
-    def val_dataloader(self):
-        return DataLoader(self.dataset["val"], batch_size=self.hparams["batch_size"])
     
     def forward(self, x):
         x = self.model(x)
@@ -156,3 +143,22 @@ class GeneralPLModule(pl.LightningModule):
             print("P-Rate: \t{:.2f}".format(p_rate))
         
         return {"tp":tp, "fp":fp, "tn":tn, "fn":fn, "correct":correct, "n":len(loader.dataset), "acc":acc, "prec":prec, "rec":rec, "f1":f1, "attack_args":attack_args, "p_rate":p_rate}
+        
+
+    '''
+     for dataset/data loading
+    '''
+    def set_dataset(self, split_mode, dataset):
+        self.dataset[split_mode] = dataset
+        
+    # more general method for dataloader
+    def get_dataloader(self, split_mode, **params):
+        return DataLoader(self.datasets[split_mode], **params)
+
+    @pl.data_loader
+    def train_dataloader(self):
+        return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"])
+
+    @pl.data_loader
+    def val_dataloader(self):
+        return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"])

@@ -55,17 +55,7 @@ class M5(nn.Module):
         scores = scores[0]
         return scores # this output should be of shape [BATCH_SIZE, 2]
 
-    def getDatasetInfo(self):
-        dataset_type = {"sample_rate": 8000}
-        dataset_params = {}
-        return dataset_type, dataset_params
-    
-    def setDataset(self, split_mode, dataset):
-        self.datasets[split_mode] = dataset
-        
-    def getDataLoader(self, split_mode, **params):
-        return DataLoader(self.datasets[split_mode], **params)
-        
+ 
 class M5PLModule(GeneralPLModule):
 
     def __init__(self, hparams):
@@ -73,12 +63,11 @@ class M5PLModule(GeneralPLModule):
         self.hparams.setdefault("p_drop", 0)
         self.model = M5(hparams)
         
-    def prepare_data(self):
-        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
-        
-        self.dataset = {}
-        self.dataset["train"] = EmergencyDataset(split_mode="training", **kwargs)
-        self.dataset["val"] = EmergencyDataset(split_mode="validation", **kwargs)
+   def dataset_info(self):
+        dataset_type = {"sample_rate": 8000}
+        dataset_params = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
+        return dataset_type, dataset_params
+    
 
 class BaseM5PLModule(GeneralPLModule):
 

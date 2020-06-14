@@ -24,8 +24,12 @@ class DatasetHandler():
     def __init__(self):
         self.datasets = {}
     
+    def load_datasets(self, model):
+        self.load(model, 'training')
+        self.load(model, 'validation')
+
     def load(self, model, split_mode = 'training'):
-        dataset_type, dataset_params = model.getDatasetInfo()
+        dataset_type, dataset_params = model.dataset_info()
         dataset_params = {"split_mode": split_mode, **dataset_params}
         dataset_id = str({**dataset_type, **dataset_params})
         
@@ -39,4 +43,4 @@ class DatasetHandler():
             dataset = EmergencyDataset(**dataset_params)
 
         self.datasets[dataset_id] = dataset
-        model.setDataset(split_mode, dataset)
+        model.set_dataset(split_mode, dataset)
