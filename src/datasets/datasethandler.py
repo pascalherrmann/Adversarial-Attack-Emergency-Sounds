@@ -34,7 +34,7 @@ class DatasetHandler():
         dataset_id = str({**dataset_type, **dataset_params})
         
         if dataset_id in self.datasets:
-            model.setDataset(split_mode, self.datasets[dataset_id])
+            model.set_dataset(split_mode, self.datasets[dataset_id])
             return
             
         if dataset_type['sample_rate'] == 48000:
