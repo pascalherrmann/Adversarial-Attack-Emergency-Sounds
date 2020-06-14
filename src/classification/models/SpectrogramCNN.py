@@ -38,13 +38,14 @@ class SpectrogramCNN(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x,dim=1)
     
-    def getDatasetInfo(self):
+
+class SpectrogramCNNPLModule(GeneralPLModule):
+
+    def __init__(self):
+        super().__init__()
+        self.model = SpectrogramCNN()
+        
+    def dataset_info(self):
         dataset_type = {"sample_rate": 48000}
         dataset_params = {"fixed_padding": True}
         return dataset_type, dataset_params
-    
-    def setDataset(self, split_mode, dataset):
-        self.datasets[split_mode] = dataset
-        
-    def getDataLoader(self, split_mode, **params):
-        return DataLoader(self.datasets[split_mode], **params)
