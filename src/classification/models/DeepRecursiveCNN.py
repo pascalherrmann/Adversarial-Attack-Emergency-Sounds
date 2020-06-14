@@ -88,7 +88,7 @@ class DeepRecursiveCNNPLModule(GeneralPLModule):
 
     def __init__(self):
         super().__init__({})
-        self.model = SpectrogramCNN()
+        self.model = DeepRecursiveCNN()
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 48000}
