@@ -1,3 +1,4 @@
+*.pickl*.pickle
 checkpoints
 saved_models
 */lightning_logs/*
