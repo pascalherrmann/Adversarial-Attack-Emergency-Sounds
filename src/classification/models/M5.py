@@ -55,7 +55,6 @@ class M5(nn.Module):
         scores = scores[0]
         return scores # this output should be of shape [BATCH_SIZE, 2]
 
- 
 class M5PLModule(GeneralPLModule):
 
     def __init__(self, hparams):
@@ -63,7 +62,7 @@ class M5PLModule(GeneralPLModule):
         self.hparams.setdefault("p_drop", 0)
         self.model = M5(hparams)
         
-   def dataset_info(self):
+    def dataset_info(self):
         dataset_type = {"sample_rate": 8000}
         dataset_params = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
         return dataset_type, dataset_params
