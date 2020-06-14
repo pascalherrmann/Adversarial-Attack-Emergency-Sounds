@@ -44,7 +44,7 @@ class SpectrogramCNN(nn.Module):
 class SpectrogramCNNPLModule(GeneralPLModule):
 
     def __init__(self):
-        super().__init__()
+        super().__init__({})
         self.model = SpectrogramCNN()
         
     def dataset_info(self):
