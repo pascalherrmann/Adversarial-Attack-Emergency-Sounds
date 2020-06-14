@@ -53,6 +53,7 @@ class AudioSet(data.Dataset):
         self.fixed_padding = fixed_padding
         self.transforms = transforms
         
+        print("Load: " + str(self.pickle_path))
         self.whole_data = pickle.load(open(self.pickle_path, 'rb'))
         
 
