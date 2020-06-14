@@ -41,7 +41,7 @@ class GeneralPLModule(pl.LightningModule):
         tensorboard_logs = {'validation_loss': avg_loss, 'validation_acc': acc}
         return {'validation_loss': avg_loss, 'validation_acc': acc, 'log': tensorboard_logs} 
     
-    def training_end(self, outputs):
+    def trainindg_end(self, outputs):
         avg_loss, acc = self.general_end(outputs, "training")
         print("Train-Acc={}".format(acc))
         tensorboard_logs = {'training_loss': avg_loss, 'training_acc': acc}
@@ -95,13 +95,13 @@ class GeneralPLModule(pl.LightningModule):
     #
     
     def setAttack(self, attack_class, attack_args):
-        self.attack = attack_class(self.model, self.validation_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
+        self.attack = attack_class(self.model, self.val_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
     
     def report(self, loader=None, attack=None, attack_args=None, log=True):
         self.model.to(self.device)
 
         tp, fp, tn, fn, correct = 0, 0, 0, 0, 0
-        if not loader: loader = self.validation_dataloader()
+        if not loader: loader = self.val_dataloader()
 
         self.model.eval()
 
@@ -154,9 +154,9 @@ class GeneralPLModule(pl.LightningModule):
         return DataLoader(self.datasets[split_mode], **params)
 
     @pl.data_loader
-    def training_dataloader(self):
+    def train_dataloader(self):
         return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"])
 
     @pl.data_loader
-    def validation_dataloader(self):
+    def val_dataloader(self):
         return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"])
