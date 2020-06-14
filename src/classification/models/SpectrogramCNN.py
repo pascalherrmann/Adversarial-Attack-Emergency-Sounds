@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
+from classification.trainer.GeneralPLModule import GeneralPLModule
+
 class SpectrogramCNN(nn.Module):
     
     def __init__(self):
