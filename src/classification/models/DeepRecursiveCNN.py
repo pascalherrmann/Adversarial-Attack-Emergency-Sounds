@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
+from classification.trainer.GeneralPLModule import GeneralPLModule
+
 class DeepRecursiveCNN(nn.Module):
     def __init__(self, hidden_dim=100, numChunksList=[5,2,1]):
         super(DeepRecursiveCNN, self).__init__()
