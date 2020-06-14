@@ -41,7 +41,7 @@ class GeneralPLModule(pl.LightningModule):
         tensorboard_logs = {'validation_loss': avg_loss, 'validation_acc': acc}
         return {'validation_loss': avg_loss, 'validation_acc': acc, 'log': tensorboard_logs} 
     
-    def trainindg_end(self, outputs):
+    def training_end(self, outputs):
         avg_loss, acc = self.general_end(outputs, "training")
         print("Train-Acc={}".format(acc))
         tensorboard_logs = {'training_loss': avg_loss, 'training_acc': acc}
@@ -74,8 +74,6 @@ class GeneralPLModule(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         loss, n_correct = self.general_step(batch, batch_idx, "validation")
         return {'validation_loss': loss, 'validation_n_correct': n_correct}
-    
-
     
     def forward(self, x):
         x = self.model(x)
