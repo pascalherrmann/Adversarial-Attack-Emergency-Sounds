@@ -20,7 +20,9 @@ class GeneralPLModule(pl.LightningModule):
         self.hparams = hparams
         self.attack = None
         self.model = None
+        self.val_results_history = []
         self.dataset = {}
+
 
     #
     # Optional
@@ -39,7 +41,9 @@ class GeneralPLModule(pl.LightningModule):
         avg_loss, acc = self.general_end(outputs, "validation")
         print("Val-Acc={}".format(acc))
         tensorboard_logs = {'validation_loss': avg_loss, 'validation_acc': acc}
+        self.val_results_history.append(tensorboard_logs)
         return {'validation_loss': avg_loss, 'validation_acc': acc, 'log': tensorboard_logs} 
+
     
     def trainindg_end(self, outputs):
         avg_loss, acc = self.general_end(outputs, "training")
@@ -51,7 +55,7 @@ class GeneralPLModule(pl.LightningModule):
         x, y = batch, batch["label"]
             
         if mode == "training" and self.attack:
-            x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters))
+            x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters, N_batch = len(y)))
 
         # forward pass
         scores = self.model.forward(x) # should be of shape [batch_size, 2]
@@ -97,19 +101,21 @@ class GeneralPLModule(pl.LightningModule):
     def setAttack(self, attack_class, attack_args):
         self.attack = attack_class(self.model, self.val_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
     
-    def report(self, loader=None, attack=None, attack_args=None, log=True):
+    def report(self, loader=None, log=True):
         self.model.to(self.device)
 
         tp, fp, tn, fn, correct = 0, 0, 0, 0, 0
         if not loader: loader = self.val_dataloader()
 
-        self.model.eval()
+        self.model = self.model.to(self.device)
 
         for batch in loader:
             data, targets = batch, batch["label"]
-            data = data.to(self.device)
+            for val in data.keys():
+                data[val] = data[val].to(self.device)
+
             
-            if attack:
+            if self.attack:
                 data = self.attack.attackSample(x = data, y = targets, **self.attack.attack_parameters)
 
             scores = self.model(data)
@@ -140,7 +146,7 @@ class GeneralPLModule(pl.LightningModule):
                 100. * correct / len(loader.dataset)))
             print("P-Rate: \t{:.2f}".format(p_rate))
         
-        return {"tp":tp, "fp":fp, "tn":tn, "fn":fn, "correct":correct, "n":len(loader.dataset), "acc":acc, "prec":prec, "rec":rec, "f1":f1, "attack_args":attack_args, "p_rate":p_rate}
+        return {"tp":tp, "fp":fp, "tn":tn, "fn":fn, "correct":correct, "n":len(loader.dataset), "acc":acc, "prec":prec, "rec":rec, "f1":f1, "attack_args":self.attack.attack_parameters if self.attack else None, "p_rate":p_rate}
         
 
     '''

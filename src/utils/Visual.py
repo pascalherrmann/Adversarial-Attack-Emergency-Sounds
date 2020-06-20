@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 #
 # takes numpy as input
 # 
-def showAudio(data = None, sr = 8000):
+def show_audio(data = None, sr = 8000):
     ipd.display(ipd.Audio(data, rate=sr))
 
-def showSpectogram(sample, title="", sr = 8000):
+def show_spectogram(sample, title="", sr = 8000):
     plt.figure(figsize=(10,5))
     S = librosa.feature.melspectrogram(sample, sr=sr, n_mels=128)
     log_S = librosa.power_to_db(S, ref=np.max)
@@ -23,14 +23,14 @@ def showSpectogram(sample, title="", sr = 8000):
     plt.colorbar(format='%+02.0f dB')
     plt.tight_layout
     
-def showWaveplot(sample, title="", sr = 8000):
+def show_waveplot(sample, title="", sr = 8000):
     plt.figure(figsize=(10,5))
     plt.subplot(3, 1, 1)
     librosa.display.waveplot(sample, sr=sr)
     plt.title(title if title else 'Monophonic ')
     
 
-def drawPlot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "", y_label = "", title = "", save_path=None):
+def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "", y_label = "", title = "", save_path=None):
     
     # create an index for each tick position
     xi = list(range(len(x)))

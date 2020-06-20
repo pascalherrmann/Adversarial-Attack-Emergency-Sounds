@@ -69,6 +69,14 @@ def load_experiment(pickle_path = None, exp_folder = None):
     print("Loaded model {}".format(exp.folder_name))
     return exp
 
+# load PLModule Wrapper
+def load_module(module_path, module_class):
+    loaded_dict = torch.load(module_path)
+    module = module_class(loaded_dict["hparams"])
+    module.model.load_state_dict(loaded_dict["state_dict"])
+    module.prepare_data()
+    return module
+
 ####
 
 class RobustnessExperiment():
@@ -146,10 +154,7 @@ class RobustnessExperiment():
     def run(self, model_path, module_class, model_nickname=None):
                 
         # load model
-        loaded_dict = torch.load(model_path)
-        model = module_class(loaded_dict["hparams"])
-        model.model.load_state_dict(loaded_dict["state_dict"])
-        model.prepare_data()
+        model = load_module(model_path, module_class)
         
         # create sub directory
         model_name = os.path.basename(os.path.normpath(model_path)) if not model_nickname else model_nickname
@@ -161,17 +166,16 @@ class RobustnessExperiment():
 
         
         # evaluate through all attacks
-        for a in range(len(self.experiment_configs)):
+        for a, exp_conf in enumerate(self.experiment_configs):
             
             # get experiment_config for the current attack
-            exp_conf = self.experiment_configs[a]
             current_attack = exp_conf["attack_fn"]
             current_attack_arg_search_space = exp_conf["attack_arg"]
             meta = exp_conf["meta"]
-            title = current_attack.__name__ + "_(Atk#{}_Exp#{})".format(a, self.id)  if not meta["title"] else meta["title"]
-            print("\nPerform Attack #{}/{}: {}".format(a+1, len(self.experiment_configs), title))
-            if (title in self.all_results.keys()) and (model_name in self.all_results[title].keys()):
-                print("Attack {} has already been performed for model {} - skipping.".format(title, model_name))
+            attack_title = current_attack.__name__ + "_(Atk#{}_Exp#{})".format(a, self.id)  if not "title" in meta else meta["title"]
+            print("\nPerform Attack #{}/{}: {}".format(a+1, len(self.experiment_configs), attack_title))
+            if (attack_title in self.all_results.keys()) and (model_name in self.all_results[attack_title].keys()):
+                print("Attack {} has already been performed for model {} - skipping.".format(attack_title, model_name))
                 continue
 
             # create all possible attack args and run them
@@ -181,7 +185,8 @@ class RobustnessExperiment():
 
             current_attack_report = self.evaluate_attack(model.model, model.val_dataloader(), 
                                                          current_attack, configs, meta=meta, 
-                                                         results_dir = results_dir, model_name = model_name, title=title)
+                                                         results_dir = results_dir, 
+                                                         model_name = model_name, title=attack_title)
     def backup(self):
         path = os.path.join(self.dir, "backup.pickle")
         save_pickle(self, path)
@@ -213,12 +218,12 @@ class RobustnessExperiment():
         models = list(list(self.all_results.values())[0].keys())[1:] #first item = CONFIGS > don't plot
         return models
             
-    def show_best_models(self, metric = "success_rate", best_n = 1):
+    def show_best_models(self, metric = "success_rate", best_n = 1, limit_eps=100):
 
         for i, attack in enumerate(self.all_results.keys()):
             print("\nAttack = {}:".format(attack))
             losses = []
             for m, model in enumerate(list(self.all_results[attack].keys())[1:]): #1: 1st item is CONFIGS
                 ys = [ res[metric] for res in self.all_results[attack][model]]
-                losses.append((sum(ys), model))
+                losses.append((sum(ys[:limit_eps]), model))
             print(sorted(losses)[:best_n])
