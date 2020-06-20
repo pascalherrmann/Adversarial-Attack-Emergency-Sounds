@@ -7,9 +7,10 @@ from itertools import product
 from tqdm import tqdm
 import torch
 
-from utils.Visual import drawPlot
+from utils.Visual import draw_plot
 
 import config
+from datasets.datasethandler import DatasetHandler
 
 #### 
 # Utils - can also be used from other files.
@@ -131,7 +132,7 @@ class RobustnessExperiment():
             xs = [ res[key_x] for res in list_attack_args ] 
             ys = [ res[key_y] for res in current_attack_report ]
             vis_object = [{"data": ys, "color" : "rbgycmk"[0], "label": key_y}]
-            drawPlot(x = xs, data = vis_object, x_label = key_x, y_label = key_y, 
+            draw_plot(x = xs, data = vis_object, x_label = key_x, y_label = key_y, 
                      title = meta["title"] + " | model:" + model_name, 
                      save_path = os.path.join(results_dir, "plot_{}_{}.pdf".format(title,model_name)))
 
@@ -155,6 +156,9 @@ class RobustnessExperiment():
                 
         # load model
         model = load_module(model_path, module_class)
+        datasetHandler = DatasetHandler()
+        datasetHandler.load(model, 'training')
+        datasetHandler.load(model, 'validation') 
         
         # create sub directory
         model_name = os.path.basename(os.path.normpath(model_path)) if not model_nickname else model_nickname
@@ -209,7 +213,7 @@ class RobustnessExperiment():
                 vis_object = {"data": ys, "color" : "rbgycmk"[m], "label": model}
                 vis_objects.append(vis_object)
 
-            drawPlot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
+            draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
                      title = attack, 
                      save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
 

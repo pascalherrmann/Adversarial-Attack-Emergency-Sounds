@@ -40,7 +40,7 @@ class GeneralPLModule(pl.LightningModule):
     def validation_end(self, outputs):
         avg_loss, acc = self.general_end(outputs, "validation")
         print("Val-Acc={}".format(acc))
-        tensorboard_logs = {'validation_loss': avg_loss, 'validation_acc': acc}
+        tensorboard_logs = {'val_loss': avg_loss, 'val_acc': acc}
         self.val_results_history.append(tensorboard_logs)
         return {'validation_loss': avg_loss, 'validation_acc': acc, 'log': tensorboard_logs} 
 
@@ -161,8 +161,8 @@ class GeneralPLModule(pl.LightningModule):
 
     @pl.data_loader
     def train_dataloader(self):
-        return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"])
+        return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"], num_workers=12)
 
     @pl.data_loader
     def val_dataloader(self):
-        return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"])
+        return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"], num_workers=12)

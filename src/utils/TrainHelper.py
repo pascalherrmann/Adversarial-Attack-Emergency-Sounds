@@ -6,6 +6,7 @@ from pytorch_lightning import loggers
 
 from utils.RobustnessExperiment import create_dir, save_json, write_to_file, save_pickle, load_pickle, load_module
 from attacks.attack import Attack
+from datasets.datasethandler import DatasetHandler
 import config
 import datetime
 
@@ -88,6 +89,9 @@ class TrainHelper():
         
         new_model_paths = []
         
+        datasetHandler = DatasetHandler()
+        print("loaded!")
+        
         for a, attack_config in enumerate(attack_configs):
             
             # get experiment_config for the current attack
@@ -108,6 +112,8 @@ class TrainHelper():
 
                 model = model_class(hparams)
                 model.prepare_data()
+                datasetHandler.load(model, 'training')
+                datasetHandler.load(model, 'validation') 
                 model.setAttack(current_attack, attack_args)
                 
                 model_title = type(model.model).__name__ + "_attack_" + current_attack.__name__ 
