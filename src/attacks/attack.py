@@ -92,7 +92,7 @@ class Attack(ABC):
         adversarial = random_sample[-1]
         ipd.display(ipd.Audio(original['audio'],
                                 rate=original['sample_rate'].item(),
-                                normalize=True))
+                                normalize=False))
         ipd.display(ipd.Audio(adversarial['audio'],
                                 rate=original['sample_rate'].item(),
                                 normalize=False))
