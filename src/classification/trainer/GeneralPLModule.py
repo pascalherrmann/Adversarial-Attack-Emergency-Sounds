@@ -24,6 +24,8 @@ class GeneralPLModule(pl.LightningModule):
         self.attack = None
         self.model = None
         self.special_validation_end = None
+        self.smooth = False
+        self.sigma = 0
         self.val_results_history = []
         self.dataset = {}
 
@@ -65,7 +67,7 @@ class GeneralPLModule(pl.LightningModule):
             x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters, N_batch = len(y)))
 
         # forward pass
-        scores = self.model.forward(x) # should be of shape [batch_size, 2]
+        scores = self.forward(x) # should be of shape [batch_size, 2]
 
         # compute loss
         loss = F.cross_entropy(scores, y)
@@ -87,7 +89,12 @@ class GeneralPLModule(pl.LightningModule):
         return {'validation_loss': loss, 'validation_n_correct': n_correct}
     
     def forward(self, x):
-        x = self.model(x)
+        
+        if self.smooth:
+            noise = torch.randn_like(x["audio"]) * self.sigma
+            x["audio"] = (x["audio"] + noise).clamp(-1, 1)
+        
+        x = self.model.forward(x)
         return x#F.log_softmax(x, dim = 2)
 
     def general_end(self, outputs, mode):
@@ -110,6 +117,10 @@ class GeneralPLModule(pl.LightningModule):
         
     def set_special_validation_end(self, fn):
         self.special_validation_end = fn
+        
+    def set_smooth(self, sigma):
+        self.smooth = True
+        self.sigma = sigma
     
     def report(self, loader=None, log=True):
         self.model.to(self.device)
@@ -128,17 +139,20 @@ class GeneralPLModule(pl.LightningModule):
             if self.attack:
                 data = self.attack.attackSample(x = data, y = targets, **self.attack.attack_parameters)
 
-            scores = self.model(data)
+            scores = self.model(data).detach()
 
-            preds = scores.argmax(axis=1).cpu()
+            preds = scores.argmax(axis=1).cpu().detach()
 
-            correct += preds.eq(targets).sum()
-
+            correct += preds.eq(targets).sum().detach()
+            for val in data.keys():
+                data[val].detach()
             with torch.no_grad():
                 tp += torch.sum(preds & targets)
                 tn += torch.sum((preds == 0) & (targets == 0))
                 fp += torch.sum(((preds == 1) & (targets == 0)))
                 fn += torch.sum((targets == 1) & (preds == 0))
+                
+        tp, fp, tn, fn, correct = tp.detach(), fp.detach(), tn.detach(), fn.detach(), correct.detach()
 
         tp, fp, tn, fn, correct = tp.numpy(), fp.numpy(), tn.numpy(), fn.numpy(), correct.numpy()
         acc = (tp + tn) / (fp + fn + tp + tn)

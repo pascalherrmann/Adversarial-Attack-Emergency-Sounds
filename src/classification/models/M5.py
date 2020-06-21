@@ -19,6 +19,9 @@ class PermuteLayer(nn.Module):
 class M5(nn.Module):
     def __init__(self, hparams):
         super(M5, self).__init__()
+        
+        hparams.setdefault("p_drop", 0)
+
         self.datasets = {}
         self.model = nn.Sequential(
             nn.Conv1d(1, 128, 80, 4),
@@ -59,36 +62,9 @@ class M5PLModule(GeneralPLModule):
 
     def __init__(self, hparams):
         super().__init__(hparams)
-        self.hparams.setdefault("p_drop", 0)
         self.model = M5(hparams)
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 8000}
         dataset_params = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
         return dataset_type, dataset_params
-    
-
-class BaseM5PLModule(GeneralPLModule):
-
-    def __init__(self, hparams):
-        super().__init__(hparams)
-        self.hparams.setdefault("p_drop", 0)
-        self.model = BaseM5(hparams)
-        
-    def prepare_data(self):
-        kwargs = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {} #needed for using datasets on gpu
-        self.dataset = {}
-        self.dataset["train"] = EmergencyDataset("train", **kwargs)
-        self.dataset["val"] = EmergencyDataset("val", **kwargs)
-
-    
-class BaseM5(M5):
-    def __init__(self, hparams):
-        super(BaseM5, self).__init__(hparams)
-        self.sigma = 0.5
-        
-    def forward(self, inputs):
-        noise = torch.randn_like(inputs) * self.sigma
-        return super().forward((inputs + noise).clamp(-1, 1))
-
-
