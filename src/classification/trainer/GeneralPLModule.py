@@ -8,6 +8,9 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
 from utils.Helpers import sample_dict_values
 
+
+
+
 class GeneralPLModule(pl.LightningModule):        
     #
     # these functions need to be overwritten:
@@ -20,6 +23,7 @@ class GeneralPLModule(pl.LightningModule):
         self.hparams = hparams
         self.attack = None
         self.model = None
+        self.special_validation_end = None
         self.val_results_history = []
         self.dataset = {}
 
@@ -41,6 +45,9 @@ class GeneralPLModule(pl.LightningModule):
         avg_loss, acc = self.general_end(outputs, "validation")
         print("Val-Acc={}".format(acc))
         tensorboard_logs = {'val_loss': avg_loss, 'val_acc': acc}
+        
+        if self.special_validation_end: tensorboard_logs.update(self.special_validation_end(self.model, self.val_dataloader()))
+        
         self.val_results_history.append(tensorboard_logs)
         return {'validation_loss': avg_loss, 'validation_acc': acc, 'log': tensorboard_logs} 
 
@@ -100,6 +107,9 @@ class GeneralPLModule(pl.LightningModule):
     
     def setAttack(self, attack_class, attack_args):
         self.attack = attack_class(self.model, self.val_dataloader(), attack_args, early_stopping=-1, device='cuda', save_samples=False)
+        
+    def set_special_validation_end(self, fn):
+        self.special_validation_end = fn
     
     def report(self, loader=None, log=True):
         self.model.to(self.device)
@@ -161,8 +171,8 @@ class GeneralPLModule(pl.LightningModule):
 
     @pl.data_loader
     def train_dataloader(self):
-        return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"], num_workers=12)
+        return DataLoader(self.dataset["training"], shuffle=True, batch_size=self.hparams["batch_size"], num_workers=1)
 
     @pl.data_loader
     def val_dataloader(self):
-        return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"], num_workers=12)
+        return DataLoader(self.dataset["validation"], batch_size=self.hparams["batch_size"], num_workers=1)

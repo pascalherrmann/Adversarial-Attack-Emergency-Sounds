@@ -106,6 +106,7 @@ class RobustnessExperiment():
         info = "EXPERIMENT {} ".format(self.id)
         info += "\n\nExperiment-Configs {}\n\n".format(str(self.experiment_configs))
         write_to_file(info, os.path.join(self.dir, "summary.txt"))
+        self.backup()
         
     #
     # evaluates ONE attack for ONE model for a list of attack args.
@@ -191,6 +192,7 @@ class RobustnessExperiment():
                                                          current_attack, configs, meta=meta, 
                                                          results_dir = results_dir, 
                                                          model_name = model_name, title=attack_title)
+            
     def backup(self):
         path = os.path.join(self.dir, "backup.pickle")
         save_pickle(self, path)
@@ -206,16 +208,19 @@ class RobustnessExperiment():
             models = list(list(self.all_results.values())[0].keys())[1:8] #first item = CONFIGS > don't plot
 
         for i, attack in enumerate(self.all_results.keys()):
-            xs = [ res[config_key] for res in self.all_results[attack]["CONFIGS"]] 
-            vis_objects = []
-            for m, model in enumerate(models):
-                ys = [ res[results_key] for res in self.all_results[attack][model]]
-                vis_object = {"data": ys, "color" : "rbgycmk"[m], "label": model}
-                vis_objects.append(vis_object)
+            try:
+                xs = [ res[config_key] for res in self.all_results[attack]["CONFIGS"]] 
+                vis_objects = []
+                for m, model in enumerate(models):
+                    ys = [ res[results_key] for res in self.all_results[attack][model]]
+                    vis_object = {"data": ys, "color" : "rbgycmk"[m], "label": model}
+                    vis_objects.append(vis_object)
 
-            draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
-                     title = attack, 
-                     save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
+                draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
+                         title = attack, 
+                         save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
+            except:
+                print("could not find key")
 
 
     def show_evaluated_models(self):
@@ -231,3 +236,10 @@ class RobustnessExperiment():
                 ys = [ res[metric] for res in self.all_results[attack][model]]
                 losses.append((sum(ys[:limit_eps]), model))
             print(sorted(losses)[:best_n])
+            
+    def get_model_performance(self, model_path):
+        model_name = os.path.basename(os.path.normpath(model_path))
+        total_sum = 0
+        for i, attack in enumerate(self.all_results.keys()):
+            total_sum += sum([ res["acc"] for res in self.all_results[attack][model_name]] )
+        return total_sum
