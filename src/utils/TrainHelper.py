@@ -116,7 +116,7 @@ class TrainHelper():
                 datasetHandler.load(model, 'validation') 
                 model.setAttack(current_attack, attack_args)
                 
-                model_title = type(model.model).__name__ + "_attack_" + current_attack.__name__ 
+                model_title = type(model.model).__name__ + "_attack_" + (current_attack.__name__ if not meta["TITLE"] else meta["TITLE"])
                 current_dir = os.path.join(config.SAVED_MODELS_DIR, type(model.model).__name__)
                 create_dir(current_dir)
                 cb = SaveCallback(save_epochs, os.path.join(current_dir, model_title))

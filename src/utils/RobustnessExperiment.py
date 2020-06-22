@@ -212,8 +212,11 @@ class RobustnessExperiment():
                 xs = [ res[config_key] for res in self.all_results[attack]["CONFIGS"]] 
                 vis_objects = []
                 for m, model in enumerate(models):
+                    if len(model) == 2:
+                        model, title = model
+                    else: title = model
                     ys = [ res[results_key] for res in self.all_results[attack][model]]
-                    vis_object = {"data": ys, "color" : "rbgycmk"[m], "label": model}
+                    vis_object = {"data": ys, "color" : "rbgycmk"[m], "label": title}
                     vis_objects.append(vis_object)
 
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 

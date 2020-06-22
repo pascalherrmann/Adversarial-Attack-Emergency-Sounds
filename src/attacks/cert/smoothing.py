@@ -91,7 +91,7 @@ class SmoothClassifier(object):
                 num -= this_batch_size
                 
                 batch = {}
-                batch["audio"] = x["audio"].repeat((this_batch_size, 1, 1))
+                batch["audio"] = x["audio"].repeat((this_batch_size, 1))
                 noise = torch.randn_like(batch["audio"], device='cuda') * self.sigma
                 batch["audio"] = x["audio"] + noise
                 predictions = self.base_classifier(batch).argmax(1)

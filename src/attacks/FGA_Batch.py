@@ -23,7 +23,6 @@ def project(l, vals):
     return normalized.view(vals.shape)
 
 ''' use fga.py instead '''
-@DeprecationWarning
 def fast_gradient_attack(model, x, y, norm, epsilon=0.1, 
                          loss_fn=torch.nn.functional.cross_entropy):
     
