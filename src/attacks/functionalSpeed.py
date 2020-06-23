@@ -104,6 +104,11 @@ class FunctionalTimeStretchAttack(Attack):
             pad_r = max_length - (pad_l + istft.shape[1])
             return F.pad(istft, (pad_l, pad_r))
         else:
+            try:
             # slower means longer -> chopping of
-            low = int((istft.shape[1] - max_length)/2)
-            return istft[:,low:low+max_length]
+                low = int((istft.shape[1] - max_length)/2)
+                return istft[:,low:low+max_length]
+            except IndexError:
+                print(low)
+                print(max_length)
+                print(istft.shape)
