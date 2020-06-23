@@ -109,6 +109,7 @@ class FunctionalTimeStretchAttack(Attack):
                 low = int((istft.shape[1] - max_length)/2)
                 return istft[:,low:low+max_length]
             except IndexError:
+                low = int((istft.shape[1] - max_length)/2)
                 print(low)
                 print(max_length)
                 print(istft.shape)
