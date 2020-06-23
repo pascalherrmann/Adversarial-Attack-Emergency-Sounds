@@ -19,6 +19,7 @@ class FunctionalTimeStretchAttack(Attack):
         
         x = self.time_stretch_attack(x, y, num_iter_stretch, lower_stretch, upper_stretch)
         x = self.noise_attack(x, y, epsilon, num_iter, norm, loss_fn, lower, upper)
+
         return x
         
     def noise_attack(self, x, y, epsilon=0, num_iter=1,
@@ -83,18 +84,20 @@ class FunctionalTimeStretchAttack(Attack):
     def time_stretch(self, batch, speedup_rate):
         if speedup_rate == 1:
             return batch
-
+        
         n_fft = torch.tensor(2048)  # windowsize
         hop_length = torch.floor(n_fft / 4.0).int().item()
 
         # time stretch
         stft = torch.stft(batch, n_fft.item(), hop_length=hop_length)
         
-        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].cuda()
+        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].to(self.device)
         # time stretch via phase_vocoder (not differentiable):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
-
+        if batch.size(0) == 1:
+            istft = istft.unsqueeze(0)
+            
         return  self.pad_sample(istft, batch.size(1), speedup_rate)
     
     def pad_sample(self, istft, max_length, speedup_rate):
