@@ -15,7 +15,7 @@ class FunctionalInterpolationAttack(Attack):
         - clamping parameters lowerX, upperX (4 in total):
              define the max/min of interpolation volume
     '''
-    def attackSample(self, x, y, overlay_sound, epsilonInterpolation=0, epsilonNoise,
+    def attackSample(self, x, y, overlay_sound, epsilonInterpolation=0, epsilonNoise=0,
                         num_iter=1, lower1=0.8, upper1=1, lower2=0.05, upper2=0.1):
         batch_size = x['audio'].size(0)
         overlay_sound = overlay_sound.repeat(batch_size,1).cuda()
