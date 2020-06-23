@@ -18,9 +18,9 @@ class InterpolationAttack(Attack):
     def attackSample(self, x, y, overlay_sound, epsilon=0, num_iter=1,
                                lower1=0.8, upper1=1, lower2=0.05, upper2=0.1):
         batch_size = x['audio'].size(0)
-        a = torch.ones(batch_size).unsqueeze(1).cuda() # original sound volume (alpha)
-        b = torch.ones(batch_size).unsqueeze(1).cuda() # inserted sound volume (beta)
-        overlay_sound = overlay_sound.repeat(batch_size,1).cuda()
+        a = torch.ones(batch_size).unsqueeze(1).to(self.device) # original sound volume (alpha)
+        b = torch.ones(batch_size).unsqueeze(1).to(self.device) # inserted sound volume (beta)
+        overlay_sound = overlay_sound.repeat(batch_size,1).to(self.device)
 
         for i in range(num_iter):
             a.requires_grad_()
