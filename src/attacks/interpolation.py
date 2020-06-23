@@ -9,7 +9,7 @@ class InterpolationAttack(Attack):
         - take gradient wrt. the interpolation parameters a,b 
         
     Parameters:
-        - tum_sound: sound to be inserted
+        - overlay_sound: sound to be inserted
         - epsilon: gradient step size
         - num_iterations: PGD iterations
         - clamping parameters lowerX, upperX (4 in total):
