@@ -96,7 +96,8 @@ class FunctionalPitchAttack(Attack):
         # time stretch via phase_vocoder (not differentiable):
         vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
-
+        if batch.size(0) == 1:
+            istft = istft.unsqueeze(0)
         return istft
     
     # this method could be further vectorized
