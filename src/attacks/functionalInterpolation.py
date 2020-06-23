@@ -18,6 +18,7 @@ class FunctionalInterpolationAttack(Attack):
     def attackSample(self, x, y, overlay_sound, epsilonInterpolation=0, epsilonNoise=0,
                         num_iter=1, lower1=0.8, upper1=1, lower2=0.05, upper2=0.1):
         batch_size = x['audio'].size(0)
+        clip_length = x['audio'].size(1)
         overlay_sound = overlay_sound['audio'].repeat(batch_size,1).cuda()
 
         a = torch.ones(batch_size).unsqueeze(1).cuda() # original sound volume (alpha)
