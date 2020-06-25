@@ -7,9 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
 from utils.Helpers import sample_dict_values
-
-
-
+import os.path
 
 class GeneralPLModule(pl.LightningModule):        
     #
@@ -104,8 +102,13 @@ class GeneralPLModule(pl.LightningModule):
         acc = total_correct / len(self.dataset[mode])
         return avg_loss, acc
     
-    def save(self, path):
-        torch.save( {"state_dict": self.model.state_dict(), "hparams": self.hparams, "attack_args": None if not self.attack else self.attack.attack_parameters}, path)
+    def save(self, path, overwrite_if_exists = False):
+        
+        exists = os.path.isfile(path) 
+        if exists and not overwrite_if_exists:
+            raise ValueError('Model path \"{}\" already exists'.format(path))
+        
+        torch.save( {"state_dict": self.model.state_dict(), "hparams": self.hparams, "attack_args": None if not self.attack else self.attack.attack_parameters, "class": type(self)}, path)
         print("Saved model to \"{}\"".format(path))
     
     #
