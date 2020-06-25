@@ -7,6 +7,7 @@ import librosa.display
 
 import IPython.display as ipd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 #
 # takes numpy as input
@@ -30,16 +31,20 @@ def show_waveplot(sample, title="", sr = 8000):
     plt.title(title if title else 'Monophonic ')
     
 
-def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "", y_label = "", title = "", save_path=None):
+def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "x-axis", y_label = "y-axis", title = "Title", save_path=None,legend_title="Legend",legend_x_offset=1.3):
+    
+    sns.set()
+    sns.set_style("whitegrid")
+    sns.set_context("poster")
     
     # create an index for each tick position
     xi = list(range(len(x)))
 
     # create plot
-    f = plt.figure(figsize=(14,8))
+    f = plt.figure(figsize=(10,8))
 
     # y-axis: 
-    plt.ylim(0.,1.19)
+    plt.ylim(0.,1)
     plt.yticks(np.arange(0, 1.01, 0.1))
 
     for d in data:
@@ -48,9 +53,11 @@ def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "la
     plt.xlabel(x_label)
     plt.ylabel(y_label) 
     plt.xticks(xi, x)
-    plt.title(title)
+    plt.title(title,fontsize=35)
     plt.legend() 
     plt.xticks(xi)
+    leg = plt.legend(loc='center right', bbox_to_anchor=(legend_x_offset, 0.5), ncol=1, frameon=False, title=legend_title)
+    leg._legend_box.align = "left"
     plt.show()
     
     if save_path:
