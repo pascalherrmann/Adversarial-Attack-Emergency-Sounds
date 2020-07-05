@@ -1,5 +1,5 @@
 import config
-import .dataset.Dataset
+from .dataset import Dataset
 
 '''
     Model-specific dataset
