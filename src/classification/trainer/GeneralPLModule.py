@@ -181,7 +181,7 @@ class GeneralPLModule(pl.LightningModule):
         
     # more general method for dataloader
     def get_dataloader(self, split_mode, **params):
-        return DataLoader(self.datasets[split_mode], **params)
+        return DataLoader(self.dataset[split_mode], **params)
 
     @pl.data_loader
     def train_dataloader(self):
