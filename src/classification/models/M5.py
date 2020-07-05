@@ -67,4 +67,5 @@ class M5PLModule(GeneralPLModule):
     def dataset_info(self):
         dataset_type = {"sample_rate": 8000}
         dataset_params = {'num_workers': 1, 'pin_memory': True} if self.device == 'cuda' else {}
+        dataset_paras['fixed_padding'] = True
         return dataset_type, dataset_params
