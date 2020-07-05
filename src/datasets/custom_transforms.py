@@ -4,7 +4,7 @@ from torchvision import transforms
 
 import torch
 
-
+@DeprecationWarning
 class ToTensorAudio(object):
 
     def __call__(self, data):

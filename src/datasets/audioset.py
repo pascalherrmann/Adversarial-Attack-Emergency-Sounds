@@ -6,7 +6,7 @@ from torchvision import transforms
 from .custom_transforms import ToTensorAudio
 import numpy as np
 
-
+@DeprecationWarning
 class AudioSet(data.Dataset):
     """
     Input: 
@@ -45,7 +45,6 @@ class AudioSet(data.Dataset):
         """
         
         self.max_length_sample = 481489 # Will be used for padding
-        # 80249 for 8k
         self.pickle_path = pickle_folder_path
         if split_mode == 'training':
             self.pickle_path = os.path.join(pickle_folder_path, "training.p")

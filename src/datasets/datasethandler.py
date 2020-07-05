@@ -1,5 +1,5 @@
-from .audioset import AudioSet
-from .EmergencyDataset import EmergencyDataset
+import config
+import .dataset.Dataset
 
 '''
     Model-specific dataset
@@ -24,23 +24,26 @@ class DatasetHandler():
     def __init__(self):
         self.datasets = {}
     
-    def load_datasets(self, model):
-        self.load(model, 'training')
-        self.load(model, 'validation')
+    '''
+        Load all datasets needed for a model.
+        (Loads Emegency Dataset)
+    '''
+    def load_datasets(self, model, dataset_id=config.DATASET_EMERGENCY):
+        self.load(model, split_mode='training', dataset_id=dataset_id)
+        self.load(model, split_mode='validation', dataset_id=dataset_id)
+        self.load(model, split_mode='testing', dataset_id=dataset_id)
 
-    def load(self, model, split_mode = 'training'):
+    '''
+        Load specific dataset.
+    '''
+    def load(self, model, split_mode='training', dataset_id=config.DATASET_EMERGENCY):
         dataset_type, dataset_params = model.dataset_info()
         dataset_params = {"split_mode": split_mode, **dataset_params}
-        dataset_id = str({**dataset_type, **dataset_params})
+        dataset_key = str((dataset_id,{ **dataset_type, **dataset_params}))#, dataset_id})
         
-        if dataset_id in self.datasets:
-            model.set_dataset(split_mode, self.datasets[dataset_id])
+        if dataset_key in self.datasets:
+            model.set_dataset(split_mode, self.datasets[dataset_key])
             return
-            
-        if dataset_type['sample_rate'] == 48000:
-            dataset = AudioSet(**dataset_params)
-        elif dataset_type['sample_rate'] == 8000:
-            dataset = EmergencyDataset(**dataset_params)
-
-        self.datasets[dataset_id] = dataset
-        model.set_dataset(split_mode, dataset)
+        
+        self.datasets[dataset_key] = Dataset(dataset_id, **dataset_type, **dataset_params)
+        model.set_dataset(split_mode, self.datasets[dataset_key])

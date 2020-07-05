@@ -19,6 +19,7 @@ def load_preprocessed_data_from_cache(mode = "training"):
 
     return (X, y, paths)
 
+@DeprecationWarning
 class EmergencyDataset(Dataset):
     
     def __init__(self, mode = "train", split_mode="training"):
