@@ -35,7 +35,7 @@ class Dataset(Dataset):
             assert (self.max_length_sample - len(audio)) >= 0
             try:
                 audio = F.pad(audio, (0, self.max_length_sample - len(audio)), mode='constant', value=0)
-            except:
+            except AttributeError:
                 print(audio)
                 print(self.max_length_sample)
                 print(len(audio))
