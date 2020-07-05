@@ -30,7 +30,7 @@ class Dataset(Dataset):
         self.dataset = torch.load(os.path.join(dataset_directory, f"{split_mode}.pt"))
     
     def __getitem__(self, index):
-        audio = self.dataset[index]['data']
+        audio = self.dataset[index]['data'][0]
         if self.fixed_padding:
             assert self.max_length_sample - len(audio) > 0
             audio = F.pad(audio, (0, self.max_length_sample - len(audio)), mode='constant', value=0)
