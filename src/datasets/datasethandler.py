@@ -1,4 +1,4 @@
-import config
+import ..config
 from .dataset import Dataset
 
 '''

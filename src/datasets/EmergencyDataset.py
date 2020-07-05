@@ -1,7 +1,7 @@
 import os
 import torch
 from torch.utils.data import Dataset
-import config
+import ..config
 
 '''
 To create the .pt-files from scratch (i.e., run whole pre-processing pipeline: cropping/padding, normalizing, downsampling, etc.): run the file `lib dat dat`a PrepareData.py` in branch `pascal_lib`
