@@ -154,5 +154,6 @@ class TrainHelper():
 
                 new_model_paths.append(model_path)
                 
-            print("="*60 + "\nTrained Models:\n" +"="*60)
-            print(new_model_paths)
+        print("="*60 + "\nTrained Models:\n" +"="*60)
+        print(new_model_paths)
+        return new_model_paths

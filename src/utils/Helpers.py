@@ -4,7 +4,7 @@ import math
 import numpy as np
 import torch
 
-def get_n_random_epsilons(N, low=0.001, high=0.5):
+def get_n_random_epsilons(N, low=0.001, high=0.5, mode = "log"):
     log_low = np.log10(low)
     log_high = np.log10(high)
     log_samples = np.random.uniform(log_low, log_high, [int(N),1])
@@ -19,7 +19,7 @@ def sample(sampling_object, N=None):
     low, high = sampling_object["l"], sampling_object["u"]
     mode = sampling_object["SAMPLING_MODE"]
     
-    assert mode in ["log", "log_batch"]
+    assert mode in ["log", "log_batch", "u_batch"]
     
     if mode == "log":
         low_log, up_log = math.log10(low), math.log10(high)
@@ -28,6 +28,9 @@ def sample(sampling_object, N=None):
     
     elif mode == "log_batch":
         return get_n_random_epsilons(N, low, high)
+    
+    elif mode == "u_batch":
+        return torch.tensor(np.random.uniform(low, high, [int(N),1])).float().cuda()
     
 
 def sample_dict_values(sample_dict, N_batch):

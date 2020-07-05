@@ -216,14 +216,13 @@ class RobustnessExperiment():
                         model, title = model
                     else: title = model
                     ys = [ res[results_key] for res in self.all_results[attack][model]]
-                    vis_object = {"data": ys, "color" : "rbgycmk"[m], "label": title}
+                    vis_object = {"data": ys, "color" : ["red", "blue", "green", "yellow", "orange", "cyan", "magenta", "lime", "peru", "k", "k", "k", "k", "k", "k"][m], "label": title}
                     vis_objects.append(vis_object)
 
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
                          title = attack, 
                          save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
-            except:
-                print("could not find key")
+            except Exception as e: print(e)
 
 
     def show_evaluated_models(self):
