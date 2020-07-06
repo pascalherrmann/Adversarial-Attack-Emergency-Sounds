@@ -25,8 +25,8 @@ class DatasetHandler():
         self.datasets = {}
     
     '''
-        Load all datasets needed for a model.
-        (Loads Emegency Dataset)
+        Load all datasets (train, valid, test) needed for a model.
+        (Loads Emegency Dataset by default)
     '''
     def load_datasets(self, model, dataset_id=config.DATASET_EMERGENCY):
         self.load(model, split_mode='training', dataset_id=dataset_id)
