@@ -12,10 +12,10 @@ from classification.trainer.GeneralPLModule import GeneralPLModule
 
 # Architecture inspiration from: https://github.com/keunwoochoi/music-auto_tagging-keras
 class AudioCRNN(nn.Module):
-    def __init__(self, config={}, state_dict=None):
+    def __init__(self, state_dict=None):
         super(AudioCRNN, self).__init__()
         self.datasets = {}
-        in_chan = 2 if config['transforms']['args']['channels'] == 'stereo' else 1
+        in_chan = 1
 
         self.logger = logging.getLogger(self.__class__.__name__)
         self.config = config
@@ -28,7 +28,9 @@ class AudioCRNN(nn.Module):
                                 fft_length=2048, 
                                 norm='whiten', 
                                 stretch_param=[0.4, 0.4])
-        self.net = parse_cfg(config['cfg'], in_shape=[in_chan, self.spec.n_mels, 400])
+
+        config = os.path.join(os.path.dirname(os.path.abspath(__file__)), "crnn/crnn.cfg")
+        self.net = parse_cfg(open(config), in_shape=[in_chan, self.spec.n_mels, 400])
 
     def _many_to_one(self, t, lengths):
         return t[torch.arange(t.size(0)), lengths - 1]
