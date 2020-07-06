@@ -12,9 +12,9 @@ from classification.models.crnn.audio import MelspectrogramStretch
 from classification.trainer.GeneralPLModule import GeneralPLModule
 
 # Architecture inspiration from: https://github.com/keunwoochoi/music-auto_tagging-keras
-class AudioCRNN(nn.Module):
+class CRNN(nn.Module):
     def __init__(self, state_dict=None):
-        super(AudioCRNN, self).__init__()
+        super(CRNN, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
 
         self.in_chan = 1
@@ -82,12 +82,11 @@ class AudioCRNN(nn.Module):
         
         return x
     
-class AudioCRNNPLModule(GeneralPLModule):
+class CRNNPLModule(GeneralPLModule):
     
     def __init__(self, hparams, state_dict=None):
         super().__init__(hparams)
-
-        self.model = AudioCRNN(state_dict)
+        self.model = CRNN(state_dict)
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 48000}
