@@ -87,10 +87,10 @@ class AudioCRNN(nn.Module):
     
 class AudioCRNNPLModule(GeneralPLModule):
     
-    def __init__(self, hparams, config={}, state_dict=None):
+    def __init__(self, hparams, state_dict=None):
         super().__init__(hparams)
 
-        self.model = AudioCRNN(config, state_dict)
+        self.model = AudioCRNN(state_dict)
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 48000}
