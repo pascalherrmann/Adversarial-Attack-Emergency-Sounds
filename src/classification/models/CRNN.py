@@ -28,7 +28,7 @@ class AudioCRNN(nn.Module):
                                 stretch_param=[0.4, 0.4])
 
         config = os.path.join(os.path.dirname(os.path.abspath(__file__)), "crnn/crnn.cfg")
-        self.net = parse_cfg(open(config), in_shape=[in_chan, self.spec.n_mels, 400])
+        self.net = parse_cfg(open(config), in_shape=[self.in_chan, self.spec.n_mels, 400])
 
     def _many_to_one(self, t, lengths):
         return t[torch.arange(t.size(0)), lengths - 1]
