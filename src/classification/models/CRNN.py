@@ -6,8 +6,6 @@ from torch.utils.data import DataLoader
 from torchparse import parse_cfg
 import numpy as np
 import logging
-import json
-import os
 
 from classification.models.crnn.audio import MelspectrogramStretch
 from classification.trainer.GeneralPLModule import GeneralPLModule
@@ -87,12 +85,8 @@ class AudioCRNN(nn.Module):
     
 class AudioCRNNPLModule(GeneralPLModule):
     
-    def __init__(self, hparams, config=None, state_dict=None):
+    def __init__(self, hparams, config={}, state_dict=None):
         super().__init__(hparams)
-        if config == None:
-            config = os.path.dirname(os.path.abspath(__file__))
-            config = os.path.join(config, "crnn/crnn.cfg")
-            config = json.loads(config)
 
         self.model = AudioCRNN(config, state_dict)
         
