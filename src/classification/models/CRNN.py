@@ -14,12 +14,9 @@ from classification.trainer.GeneralPLModule import GeneralPLModule
 class AudioCRNN(nn.Module):
     def __init__(self, state_dict=None):
         super(AudioCRNN, self).__init__()
-        self.datasets = {}
-        in_chan = 1
-
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.config = config
-        
+
+        self.in_chan = 1
         self.classes = ['negative', 'positive']
         self.lstm_units = 64
         self.lstm_layers = 2
