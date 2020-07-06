@@ -87,10 +87,13 @@ class AudioCRNN(nn.Module):
     
 class AudioCRNNPLModule(GeneralPLModule):
     
-    def __init__(self, hparams,
-                       config=os.path.join(os.path.dirname(os.path.abspath(__file__)), "crnn/crnn.cfg"),
-                       state_dict=None):
+    def __init__(self, hparams, config=None, state_dict=None):
         super().__init__(hparams)
+        if config == None:
+            config = os.path.dirname(os.path.abspath(__file__))
+            config = os.path.join(config, "crnn/crnn.cfg")
+            config = json.loads(config)
+
         self.model = AudioCRNN(config, state_dict)
         
     def dataset_info(self):
