@@ -52,11 +52,13 @@ class GeneralPLModule(pl.LightningModule):
         return {'validation_loss': avg_loss, 'validation_acc': acc, 'log': tensorboard_logs} 
 
     
-    def trainindg_end(self, outputs):
+    def training_epoch_end(self, outputs):
         avg_loss, acc = self.general_end(outputs, "training")
         print("Train-Acc={}".format(acc))
         tensorboard_logs = {'training_loss': avg_loss, 'training_acc': acc}
         return {'training_loss': avg_loss, 'training_acc': acc, 'log': tensorboard_logs} 
+    
+
     
     def general_step(self, batch, batch_idx, mode):
         x, y = batch, batch["label"]
@@ -80,11 +82,18 @@ class GeneralPLModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         loss, n_correct = self.general_step(batch, batch_idx, "training")
         tensorboard_logs = {'loss': loss}
-        return {'loss': loss, 'training_n_correct': n_correct, 'log': tensorboard_logs}
+        return {"training_loss": loss, 'loss': loss, 'training_n_correct': n_correct, 'log': tensorboard_logs}
 
     def validation_step(self, batch, batch_idx):
         loss, n_correct = self.general_step(batch, batch_idx, "validation")
         return {'validation_loss': loss, 'validation_n_correct': n_correct}
+   
+    def general_end(self, outputs, mode):
+        # average over all batches aggregated during one epoch
+        avg_loss = torch.stack([x[mode + '_loss'] for x in outputs]).mean()
+        total_correct = torch.stack([x[mode + '_n_correct'] for x in outputs]).sum().cpu().numpy()
+        acc = total_correct / len(self.dataset[mode])
+        return avg_loss, acc
     
     def forward(self, x):
         
@@ -95,12 +104,7 @@ class GeneralPLModule(pl.LightningModule):
         x = self.model.forward(x)
         return x#F.log_softmax(x, dim = 2)
 
-    def general_end(self, outputs, mode):
-        # average over all batches aggregated during one epoch
-        avg_loss = torch.stack([x[mode + '_loss'] for x in outputs]).mean()
-        total_correct = torch.stack([x[mode + '_n_correct'] for x in outputs]).sum().cpu().numpy()
-        acc = total_correct / len(self.dataset[mode])
-        return avg_loss, acc
+
     
     def save(self, path, overwrite_if_exists = False):
         
