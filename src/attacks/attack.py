@@ -25,7 +25,7 @@ class Attack(ABC):
         self.totalProcessed = 0
         self.adversarial_examples = []
         
-    def attack(self):
+    def attack(self, cudnn_RNN_backward_bug=False):
         assert self.totalProcessed == 0 # only attack once
 
         for i, batch in tqdm(list(enumerate(self.data_loader,0)), position=0):
@@ -46,6 +46,11 @@ class Attack(ABC):
 
             # preserve original sample
             x_to_perturb = {k: x[k].clone().to(self.device) for k in x}
+
+            # handling cudnn_RNN_backward_bug: 
+            # https://discuss.pytorch.org/t/cudnn-rnn-backward-can-only-be-called-in-training-mode/37622
+            if cudnn_RNN_backward_bug:
+                self.model.train()
 
             # perform actual attack
             x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)

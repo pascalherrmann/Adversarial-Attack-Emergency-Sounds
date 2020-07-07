@@ -10,6 +10,9 @@ class ProjectedGradientDescent(Attack):
         - For num_iter=1 and norm='inf': Degrades to Fast Gradient Sign Method (FGSM)
     '''
     def attackSample(self, x, y, epsilon=0, num_iter=1, norm='inf', loss_fn=F.nll_loss):
+        if epsilon == 0:
+            return x
+
         for _ in range(num_iter):
             x['audio'].requires_grad_()
 
