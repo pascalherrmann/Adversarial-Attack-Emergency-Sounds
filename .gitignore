@@ -1,3 +1,4 @@
+*.db
 *.pk
 *.pickle
 checkpoints

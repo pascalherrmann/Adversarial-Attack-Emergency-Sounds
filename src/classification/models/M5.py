@@ -45,7 +45,10 @@ class M5(nn.Module):
         )
         
     def forward(self, x):
-        x  = x['audio']
+        if type(x) == dict and "audio" in x:
+            x  = x['audio']
+        if x.dtype == torch.float64:
+            x = x.float()
         if len(x.shape) == 2:
             x = torch.unsqueeze(x, 1)  # if [batch_size, 80000] make it to [batch_size, 1, 8000]
 
