@@ -45,9 +45,9 @@ class M5(nn.Module):
         )
         
     def forward(self, x):
-        x  = x['audio']
+        x  = x['audio'][:8000]
         if len(x.shape) == 2:
-            x = torch.unsqueeze(x, 1)  # if [batch_size, 80000] make it to [batch_size, 1, 8000]
+            x = torch.unsqueeze(x, 1)  # if [batch_size, 8000] make it to [batch_size, 1, 8000]
 
         x = self.model(x)
 
