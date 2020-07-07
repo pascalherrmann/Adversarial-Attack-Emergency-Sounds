@@ -41,14 +41,17 @@ def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "la
     xi = list(range(len(x)))
 
     # create plot
-    f = plt.figure(figsize=(10,8))
+    f = plt.figure(figsize=(12,8))
 
     # y-axis: 
     plt.ylim(0.,1)
     plt.yticks(np.arange(0, 1.01, 0.1))
 
     for d in data:
-        plt.plot(xi, d["data"], marker='o', linestyle='--', color=d["color"], label=d["label"]) 
+        if 'color' in d:
+            plt.plot(xi, d["data"], marker='o', linestyle='--', color=d["color"], label=d["label"]) 
+        else:
+            plt.plot(xi, d["data"], marker='o', linestyle='--', label=d["label"]) 
 
     plt.xlabel(x_label)
     plt.ylabel(y_label) 
