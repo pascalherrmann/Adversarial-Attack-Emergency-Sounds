@@ -49,8 +49,9 @@ class Attack(ABC):
 
             # handling cudnn_RNN_backward_bug: 
             # https://discuss.pytorch.org/t/cudnn-rnn-backward-can-only-be-called-in-training-mode/37622
-            if cudnn_RNN_backward_bug:
-                self.model.train()
+            #if cudnn_RNN_backward_bug:
+                #self.model.train()
+            self.model.train()
 
             # perform actual attack
             x_perturbed = self.attackSample(x_to_perturb, y_true, **self.attack_parameters)
