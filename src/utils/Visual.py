@@ -31,11 +31,14 @@ def show_waveplot(sample, title="", sr = 8000):
     plt.title(title if title else 'Monophonic ')
     
 
-def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "x-axis", y_label = "y-axis", title = "Title", save_path=None,legend_title="Legend",legend_x_offset=1.5, context="paper"):
+def draw_plot(x = [1,2,3], data = [{"data": [0.1, 0.33, 0.5], "color" : "r", "label": "test"}], x_label = "x-axis", y_label = "y-axis", title = "Title", save_path=None,legend_title="Legend",legend_x_offset=1.5, context="poster"):
     
     sns.set()
     sns.set_style("whitegrid")
     sns.set_context(context)
+    
+    if y_label == "acc": y_label = "Accuracy"
+    if x_label == "epsilon": x_label = "Epsilon"
     
     # create an index for each tick position
     xi = list(range(len(x)))
