@@ -1,4 +1,5 @@
 from .dataset import Dataset
+from .EmergencyDataset import EmergencyDataset
 import config
 
 '''
@@ -36,7 +37,7 @@ class DatasetHandler():
     '''
         Load specific dataset.
     '''
-    def load(self, model, split_mode='training', dataset_id=config.DATASET_EMERGENCY):
+    def load(self, model, split_mode='training', dataset_id=config.DATASET_EMERGENCY, old_data=False):
         dataset_type, dataset_params = model.dataset_info()
         dataset_params = {"split_mode": split_mode, **dataset_params}
         dataset_key = str((dataset_id,{ **dataset_type, **dataset_params}))#, dataset_id})
@@ -45,5 +46,8 @@ class DatasetHandler():
             model.set_dataset(split_mode, self.datasets[dataset_key])
             return
         
-        self.datasets[dataset_key] = Dataset(dataset_id, **dataset_type, **dataset_params)
+        if old_data:
+            self.datasets[dataset_key] = EmergencyDataset(split_mode=split_mode)
+        else:
+            self.datasets[dataset_key] = Dataset(dataset_id, **dataset_type, **dataset_params)
         model.set_dataset(split_mode, self.datasets[dataset_key])
