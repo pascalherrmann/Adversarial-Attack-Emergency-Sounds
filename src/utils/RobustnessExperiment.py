@@ -216,7 +216,7 @@ class RobustnessExperiment():
                         model, title = model
                     else: title = model
                     ys = [ res[results_key] for res in self.all_results[attack][model]]
-                    vis_object = {"data": ys, "color" : ["red", "blue", "green", "yellow", "orange", "cyan", "magenta", "lime", "peru", "k", "k", "k", "k", "k", "k"][m], "label": title}
+                    vis_object = {"data": ys, "color" : ["r", "darkorange", "m", "b", "g", "k", "k"][m], "label": title}
                     vis_objects.append(vis_object)
 
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
@@ -230,6 +230,8 @@ class RobustnessExperiment():
         return models
             
     def show_best_models(self, metric = "success_rate", best_n = 1, limit_eps=100):
+        
+        higher_is_better = metric == "acc"
 
         for i, attack in enumerate(self.all_results.keys()):
             print("\nAttack = {}:".format(attack))
@@ -237,7 +239,7 @@ class RobustnessExperiment():
             for m, model in enumerate(list(self.all_results[attack].keys())[1:]): #1: 1st item is CONFIGS
                 ys = [ res[metric] for res in self.all_results[attack][model]]
                 losses.append((sum(ys[:limit_eps]), model))
-            print(sorted(losses)[:best_n])
+            print(sorted(losses, reverse=higher_is_better)[:best_n])
             
     def get_model_performance(self, model_path):
         model_name = os.path.basename(os.path.normpath(model_path))
