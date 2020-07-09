@@ -13,11 +13,11 @@ from classification.trainer.GeneralPLModule import GeneralPLModule
 
 # Architecture inspiration from: https://github.com/keunwoochoi/music-auto_tagging-keras
 class CRNN(nn.Module):
-    def __init__(self, state_dict=None):
+    def __init__(self, state_dict=None, device='cuda'):
         super(CRNN, self).__init__()
-        print("HI")
         self.logger = logging.getLogger(self.__class__.__name__)
-
+        self.device = device
+        
         self.in_chan = 1
         self.classes = ['negative', 'positive']
         self.lstm_units = 64
@@ -47,10 +47,13 @@ class CRNN(nn.Module):
                     nn.Dropout(p=0.1, inplace=False),
                    )
         self.recur = nn.LSTM(128, 64, num_layers=2, bidirectional=True)
+        self.lstm_hidden_size=64
+        self.LSTMCell = nn.LSTMCell(input_size=128, hidden_size=self.lstm_hidden_size)
+        
         self.dense = nn.Sequential(
                         nn.Dropout(p=0.3, inplace=False),
-                        nn.BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-                        nn.Linear(in_features=128, out_features=2, bias=True)
+                        nn.BatchNorm1d(self.lstm_hidden_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                        nn.Linear(in_features=self.lstm_hidden_size, out_features=2, bias=True)
                     )
 
     def _many_to_one(self, t, lengths):
@@ -70,6 +73,8 @@ class CRNN(nn.Module):
 
     def forward(self, batch):
         x = batch['audio'].float()
+        batch_size = x.size(0)
+        #print(x.shape)
         
         # x-> (batch, time, channel)
         x = x.unsqueeze(2) # add channel dim
@@ -91,17 +96,22 @@ class CRNN(nn.Module):
         # xt -> (batch, time, channel*freq)
         batch, time = x.size()[:2]
         x = x.reshape(batch, time, -1)
-        x_pack = torch.nn.utils.rnn.pack_padded_sequence(x, lengths, batch_first=True)
-    
-        # x -> (batch, time, lstm_out)
-        x_pack, hidden = self.recur(x_pack)
-        x, _ = torch.nn.utils.rnn.pad_packed_sequence(x_pack, batch_first=True)
-    
-        # (batch, lstm_out)
-        x = self._many_to_one(x, lengths)
-        # (batch, classes)
-        x = self.dense(x)
+        #print(x.shape)
+        # x -> time, batch, data
+        x = x.transpose(0,1)
+        #print(x.shape)
         
+        hx = torch.zeros(batch_size, self.lstm_hidden_size).to(self.device)
+        cx = torch.zeros(batch_size, self.lstm_hidden_size).to(self.device)
+        for i in range(x.size(0)):
+            hx, cx = self.LSTMCell(x[i], (hx, cx))
+        
+        #print(hx.shape)
+        
+        # (batch, classes)
+        x = self.dense(hx)
+        
+        #print(x.shape)
         return x
     
 class CRNNPLModule(GeneralPLModule):
