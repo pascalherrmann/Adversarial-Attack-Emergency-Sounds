@@ -46,7 +46,7 @@ class CRNN(nn.Module):
                     nn.MaxPool2d(kernel_size=4, stride=4, padding=0, dilation=1, ceil_mode=False),
                     nn.Dropout(p=0.1, inplace=False),
                    )
-        self.recur = nn.LSTM(128, 64, num_layers=2, bidirectional=True)
+
         self.lstm_hidden_size=64
         self.LSTMCell = nn.LSTMCell(input_size=128, hidden_size=self.lstm_hidden_size)
         
