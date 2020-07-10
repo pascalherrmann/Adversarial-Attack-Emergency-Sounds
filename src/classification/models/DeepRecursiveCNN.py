@@ -88,7 +88,7 @@ class DeepRecursiveCNNPLModule(GeneralPLModule):
 
     def __init__(self, hparams):
         super().__init__(hparams)
-        self.model = DeepRecursiveCNN()
+        self.model = DeepRecursiveCNN(p_drop=hparams['p_drop'])
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 48000}
