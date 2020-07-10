@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from classification.trainer.GeneralPLModule import GeneralPLModule
 
 class DeepRecursiveCNN(nn.Module):
-    def __init__(self, hidden_dim=100, numChunksList=[5,2,1]):
+    def __init__(self, p_drop=0.2, hidden_dim=100, numChunksList=[5,2,1]):
         super(DeepRecursiveCNN, self).__init__()
         self.datasets={}
         
@@ -21,7 +21,7 @@ class DeepRecursiveCNN(nn.Module):
         self.conv1 = nn.Conv1d(1, 128, 80, 4)
         self.bn1 = nn.BatchNorm1d(128)
         self.pool1 = nn.MaxPool1d(4)
-        self.drop1 = nn.Dropout(p=0.2)
+        self.drop1 = nn.Dropout(p=p_drop)
         
         self.conv2 = nn.Conv1d(128, 256, 3)
         self.bn2 = nn.BatchNorm1d(256)
@@ -88,7 +88,7 @@ class DeepRecursiveCNNPLModule(GeneralPLModule):
 
     def __init__(self, hparams):
         super().__init__(hparams)
-        self.model = DeepRecursiveCNN()
+        self.model = DeepRecursiveCNN(p_drop=hparams['p_drop'])
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 48000}

@@ -9,7 +9,7 @@ To create the .pt-files from scratch (i.e., run whole pre-processing pipeline: c
 
 def load_preprocessed_data_from_cache(mode = "training"):
     
-    directory = config.DATA_8K_DIR
+    directory = config.DATASET1_DATA_8K_DIR_OLD
     print("Loading cached {} data from {}".format(mode, directory))
 
     
@@ -19,10 +19,10 @@ def load_preprocessed_data_from_cache(mode = "training"):
 
     return (X, y, paths)
 
-@DeprecationWarning
 class EmergencyDataset(Dataset):
     
     def __init__(self, mode = "train", split_mode="training"):
+        print("DEPRECATED EM Dataset")
         # initially "mode" was used, thats deprecated now
         # now we use "split_mode"
         # TODO refactor:
