@@ -80,6 +80,7 @@ class TrainHelper():
         create_dir(config.SAVED_MODELS_DIR)
         self.log_dir = os.path.join(config.SAVED_MODELS_DIR, "logs")
         create_dir(self.log_dir)
+        self.datasetHandler = DatasetHandler()
          
     # run adversarial training for one model for a list of attacks with different arguments
     def run(self, model_class, hparams, attack_configs, save_epochs = [50, 100, 150, 200, 250]):
@@ -89,7 +90,7 @@ class TrainHelper():
         
         new_model_paths = []
         
-        datasetHandler = DatasetHandler()
+        datasetHandler = self.datasetHandler 
         print("loaded!")
         
         for a, attack_config in enumerate(attack_configs):
