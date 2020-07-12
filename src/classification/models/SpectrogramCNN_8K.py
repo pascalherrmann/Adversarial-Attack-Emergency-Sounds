@@ -48,8 +48,7 @@ class SpectrogramCNN_8K(nn.Module):
         self.dense = nn.Sequential(                 
                         nn.Linear(1280, hparams["n_hidden"]),
                         nn.PReLU(),
-                        nn.Dropout(p=0.35, inplace=False),
-
+                        nn.Dropout(p=hparams["p_dropout"], inplace=False),
                         nn.Linear(hparams["n_hidden"], 2)  
                     )
 
