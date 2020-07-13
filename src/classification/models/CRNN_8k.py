@@ -46,7 +46,7 @@ class CRNN8k(nn.Module):
                                 norm='whiten', 
                                 stretch_param=[0.4, 0.4])        
         
-        self.spec = MelspectrogramStretch()
+        self.spec = MelspectrogramStretch() # TODO sample rate?
         self.convs = nn.Sequential(
             
                     nn.Conv2d(1, 32, kernel_size=(3, 3)),
