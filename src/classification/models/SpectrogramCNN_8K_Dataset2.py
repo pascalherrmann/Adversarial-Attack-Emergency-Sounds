@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader
 
 from classification.trainer.GeneralPLModule import GeneralPLModule
 
-class SpectrogramCNN_8K(nn.Module):
+class SpectrogramCNN_8K_Dataset2(nn.Module):
     
     def __init__(self, hparams):
         super(SpectrogramCNN_8K, self).__init__()
@@ -74,11 +74,11 @@ class SpectrogramCNN_8K(nn.Module):
         return F.log_softmax(x,dim=1)
     
 
-class SpectrogramCNN_8KPLModule(GeneralPLModule):
+class SpectrogramCNN_8K_Dataset2_PLModule(GeneralPLModule):
 
     def __init__(self, hparams):
         super().__init__(hparams)
-        self.model = SpectrogramCNN_8K(hparams)
+        self.model = SpectrogramCNN_8K_Dataset2(hparams)
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 8000}
