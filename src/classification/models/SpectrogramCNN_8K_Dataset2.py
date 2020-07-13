@@ -19,7 +19,7 @@ from classification.trainer.GeneralPLModule import GeneralPLModule
 class SpectrogramCNN_8K_Dataset2(nn.Module):
     
     def __init__(self, hparams):
-        super(SpectrogramCNN_8K, self).__init__()
+        super(SpectrogramCNN_8K_Dataset2, self).__init__()
         self.datasets = {}
         
         self.windowsize = 800
