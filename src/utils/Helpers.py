@@ -16,20 +16,23 @@ def get_n_random_epsilons(N, low=0.001, high=0.5, mode = "log"):
 
 def sample(sampling_object, N=None):
     
-    low, high = sampling_object["l"], sampling_object["u"]
     mode = sampling_object["SAMPLING_MODE"]
+    assert mode in ["log", "log_batch", "u_batch", "choice"]
     
-    assert mode in ["log", "log_batch", "u_batch"]
+    if mode == "choice":
+        return random.choice(sampling_object["options"])
+    
+    low, high = sampling_object["l"], sampling_object["u"]
     
     if mode == "log":
         low_log, up_log = math.log10(low), math.log10(high)
         sample_log = random.uniform(low_log, up_log)
         return 10 ** sample_log
     
-    elif mode == "log_batch":
+    if mode == "log_batch":
         return get_n_random_epsilons(N, low, high)
     
-    elif mode == "u_batch":
+    if mode == "u_batch":
         return torch.tensor(np.random.uniform(low, high, [int(N),1])).float().cuda()
     
 

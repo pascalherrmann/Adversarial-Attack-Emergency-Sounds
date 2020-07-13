@@ -63,6 +63,7 @@ class GeneralPLModule(pl.LightningModule):
     def general_step(self, batch, batch_idx, mode):
         x, y = batch, batch["label"]
             
+        # for adversarial training: 
         if mode == "training" and self.attack:
             x = self.attack.attackSample(x, y, **sample_dict_values(self.attack.attack_parameters, N_batch = len(y)))
 
@@ -97,6 +98,7 @@ class GeneralPLModule(pl.LightningModule):
     
     def forward(self, x):
         
+        # for randomized smoothing: train a smooth classifier, i.e., with train with adding Gaussian Noise
         if self.smooth:
             noise = torch.randn_like(x["audio"]) * self.sigma
             x["audio"] = (x["audio"] + noise).clamp(-1, 1)

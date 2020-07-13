@@ -11,6 +11,8 @@ from utils.Visual import draw_plot
 
 import config
 from datasets.datasethandler import DatasetHandler
+from classification.models.M5 import M5PLModule
+
 
 #### 
 # Utils - can also be used from other files.
@@ -158,8 +160,7 @@ class RobustnessExperiment():
         # load model
         model = load_module(model_path, module_class)
         datasetHandler = DatasetHandler()
-        datasetHandler.load(model, 'training')
-        datasetHandler.load(model, 'validation') 
+        datasetHandler.load(model, 'validation', old_data=(module_class==M5PLModule)) 
         
         # create sub directory
         model_name = os.path.basename(os.path.normpath(model_path)) if not model_nickname else model_nickname
@@ -216,7 +217,7 @@ class RobustnessExperiment():
                         model, title = model
                     else: title = model
                     ys = [ res[results_key] for res in self.all_results[attack][model]]
-                    vis_object = {"data": ys, "color" : ["r", "darkorange", "m", "b", "g", "k", "k"][m], "label": title}
+                    vis_object = {"data": ys, "color" : ['r', 'darkorange', 'g', 'b', "k", 'g', 'b', ][m], "label": title}
                     vis_objects.append(vis_object)
 
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
