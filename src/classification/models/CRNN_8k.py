@@ -1,3 +1,20 @@
+'''
+hparams = {
+    "batch_size": 64,
+    "learning_rate": 9e-4,
+    "weight_decay": 1e-3,
+    "lr_decay": 0.95,
+    "epochs": 50,
+    "p_dropout": 0.36,
+    "n_hidden": 10,
+    "lstm_hidden_size": 64
+}
+
+# 90.45% acc
+'''
+
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -23,6 +40,7 @@ class CRNN8k(nn.Module):
         self.lstm_units = 64
         self.lstm_layers = 2
         self.spec = MelspectrogramStretch(hop_length=None, 
+                                          sample_rate=8000, 
                                 num_mels=128, 
                                 fft_length=2048, 
                                 norm='whiten', 

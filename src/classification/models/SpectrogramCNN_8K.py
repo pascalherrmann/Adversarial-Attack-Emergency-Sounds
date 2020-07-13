@@ -1,3 +1,14 @@
+'''
+hparams: = {'batch_size': 16, 
+            'learning_rate': 0.0009471138112165006, 
+            'p_dropout': 0.3394112556659779, 
+            'n_hidden': 711, 
+            'lr_decay': 0.7514824092200452, 
+            'weight_decay': 0.003018912473366329}
+-> spectrogramxxx_v359_acc_0.8998_best.p
+'''
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
