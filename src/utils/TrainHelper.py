@@ -20,7 +20,7 @@ class SaveCallback(Callback):
 
     def on_epoch_end(self, trainer, pl_module):
         if (trainer.current_epoch + 1) in self.save_epochs:
-            save_path = self.model_name + "_v{}_epoch_{}.p".format(trainer.logger.version, trainer.current_epoch + 1)
+            save_path = "v_{}_{}_epoch_{}.p".format(trainer.logger.version, self.model_name, trainer.current_epoch + 1)
             pl_module.save(save_path)
             print("Saved checkpoint at epoch {} at \"{}\"".format((trainer.current_epoch + 1), save_path))
 
@@ -132,7 +132,7 @@ class TrainHelper():
                 trainer.fit(model)
                 
                 model_class_name = type(model.model).__name__
-                model_name = model_title + "_v" + str(trainer.logger.version) + ".p"
+                model_name = "v_{}_{}.p".format(trainer.logger.version, model_title)
                 model_path = os.path.join(current_dir, model_name)
                 model.save(model_path)
                 
@@ -154,6 +154,8 @@ class TrainHelper():
 
                 new_model_paths.append(model_path)
                 
+        from utils.Visual import draw_plot, notify
+        notify()
         print("="*60 + "\nTrained Models:\n" +"="*60)
         print(new_model_paths)
         return new_model_paths

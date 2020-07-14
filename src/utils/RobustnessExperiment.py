@@ -13,7 +13,6 @@ import config
 from datasets.datasethandler import DatasetHandler
 from classification.models.M5 import M5PLModule
 
-
 #### 
 # Utils - can also be used from other files.
 ####

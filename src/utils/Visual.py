@@ -83,3 +83,27 @@ def save_audio(np_sample, sr = 8000, title = "exported_sample"):
     path = os.path.join(directory, file_name)
     
     librosa.output.write_wav(path, np_sample, sr)
+    
+    
+    
+#
+#
+#
+def speak(text):
+    from IPython.display import Javascript as js, clear_output
+    # Escape single quotes
+    text = text.replace("'", r"\'")
+    display(js('''
+    if(window.speechSynthesis) {{
+        var synth = window.speechSynthesis;
+        synth.speak(new window.SpeechSynthesisUtterance('{text}'));
+    }}
+    '''.format(text=text)))
+    # Clear the JS so that the notebook doesn't speak again when reopened/refreshed
+    clear_output(False)
+    
+def notify(language = "DE"):
+    if language == "DE":
+        speak("Hallo! Hier ist Jupyter Notebook! Ihre Berechnungen wurden soeben fertig gestellt. Ich wünsche viel Spaß und einen angenehmen Tag")
+    else:
+        speak("Your Jupyter Notebook Operation has just been finished!")
