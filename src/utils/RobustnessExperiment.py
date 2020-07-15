@@ -220,7 +220,7 @@ class RobustnessExperiment():
                     vis_objects.append(vis_object)
 
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
-                         title = attack, 
+                         title = attack + " (after adversarial training)", 
                          save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
             except Exception as e: print(e)
 
