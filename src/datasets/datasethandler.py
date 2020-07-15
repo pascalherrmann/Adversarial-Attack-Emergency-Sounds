@@ -29,10 +29,10 @@ class DatasetHandler():
         Load all datasets (train, valid, test) needed for a model.
         (Loads Emegency Dataset by default)
     '''
-    def load_datasets(self, model, dataset_id=config.DATASET_EMERGENCY):
-        self.load(model, split_mode='training', dataset_id=dataset_id)
-        self.load(model, split_mode='validation', dataset_id=dataset_id)
-        self.load(model, split_mode='testing', dataset_id=dataset_id)
+    def load_datasets(self, model, dataset_id=config.DATASET_EMERGENCY, old_data=False):
+        self.load(model, split_mode='training', dataset_id=dataset_id, old_data=old_data)
+        self.load(model, split_mode='validation', dataset_id=dataset_id, old_data=old_data)
+        self.load(model, split_mode='testing', dataset_id=dataset_id, old_data=old_data)
 
     '''
         Load specific dataset.
