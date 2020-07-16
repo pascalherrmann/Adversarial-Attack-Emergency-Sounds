@@ -13,14 +13,16 @@ import datetime
 from pytorch_lightning.callbacks import Callback
 
 class SaveCallback(Callback): 
-    def __init__(self, save_epochs, model_name):
+    def __init__(self, save_epochs, model_dir, model_name):
         super().__init__()
         self.save_epochs = save_epochs
+        self.model_dir = model_dir
         self.model_name = model_name
 
     def on_epoch_end(self, trainer, pl_module):
         if (trainer.current_epoch + 1) in self.save_epochs:
-            save_path = "v_{}_{}_epoch_{}.p".format(trainer.logger.version, self.model_name, trainer.current_epoch + 1)
+            title = "v_{}_{}_epoch_{}.p".format(trainer.logger.version, self.model_name, trainer.current_epoch + 1)
+            save_path = os.path.join(self.model_dir, title)
             pl_module.save(save_path)
             print("Saved checkpoint at epoch {} at \"{}\"".format((trainer.current_epoch + 1), save_path))
 
@@ -119,7 +121,7 @@ class TrainHelper():
                 model_title = type(model.model).__name__ + "_attack_" + (current_attack.__name__ if not meta["TITLE"] else meta["TITLE"])
                 current_dir = os.path.join(config.SAVED_MODELS_DIR, type(model.model).__name__)
                 create_dir(current_dir)
-                cb = SaveCallback(save_epochs, os.path.join(current_dir, model_title))
+                cb = SaveCallback(save_epochs, model_dir = current_dir, model_name = model_title)
 
                 trainer = pl.Trainer(
                     max_epochs=hparams["epochs"],
