@@ -1,20 +1,3 @@
-'''
-hparams = {
-    "batch_size": 64,
-    "learning_rate": 9e-4,
-    "weight_decay": 1e-3,
-    "lr_decay": 0.95,
-    "epochs": 50,
-    "p_dropout": 0.36,
-    "n_hidden": 10,
-    "lstm_hidden_size": 64
-}
-
-# 90.45% acc
-'''
-
-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,9 +12,9 @@ from classification.models.crnn.audio import MelspectrogramStretch
 from classification.trainer.GeneralPLModule import GeneralPLModule
 
 # Architecture inspiration from: https://github.com/keunwoochoi/music-auto_tagging-keras
-class CRNN8k(nn.Module):
+class CRNN8k_D2(nn.Module):
     def __init__(self, hparams, state_dict=None, device='cuda'):
-        super(CRNN8k, self).__init__()
+        super(CRNN8k_D2, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.device = device
         
@@ -46,7 +29,7 @@ class CRNN8k(nn.Module):
                                 norm='whiten', 
                                 stretch_param=[0.4, 0.4])        
         
-        self.spec = MelspectrogramStretch() # TODO sample rate?
+        self.spec = MelspectrogramStretch(sample_rate=8000)
         self.convs = nn.Sequential(
             
                     nn.Conv2d(1, 32, kernel_size=(3, 3)),
@@ -155,11 +138,11 @@ class CRNN8k(nn.Module):
         #print(x.shape)
         return x
     
-class CRNN8kPLModule(GeneralPLModule):
+class CRNN8k_D2_PLModule(GeneralPLModule):
     
     def __init__(self, hparams, state_dict=None):
         super().__init__(hparams)
-        self.model = CRNN8k(hparams, state_dict=state_dict)
+        self.model = CRNN8k_D2(hparams, state_dict=state_dict)
         
     def dataset_info(self):
         dataset_type = {"sample_rate": 8000}

@@ -154,12 +154,14 @@ class RobustnessExperiment():
 
         return current_attack_report
 
-    def run(self, model_path, module_class, model_nickname=None):
+    def run(self, model_path, module_class, model_nickname=None,dataset_id=config.DATASET_EMERGENCY):
                 
         # load model
         model = load_module(model_path, module_class)
         datasetHandler = DatasetHandler()
-        datasetHandler.load(model, 'validation', old_data=(module_class==M5PLModule)) 
+
+        datasetHandler.load(model, 'training', dataset_id=dataset_id, old_data=(module_class==M5PLModule))
+        datasetHandler.load(model, 'validation', dataset_id=dataset_id, old_data=(module_class==M5PLModule))
         
         # create sub directory
         model_name = os.path.basename(os.path.normpath(model_path)) if not model_nickname else model_nickname
@@ -220,7 +222,7 @@ class RobustnessExperiment():
                     vis_objects.append(vis_object)
 
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
-                         title = attack, 
+                         title = attack + " (after adversarial training)", 
                          save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
             except Exception as e: print(e)
 
