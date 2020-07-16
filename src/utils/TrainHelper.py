@@ -80,16 +80,17 @@ class TrainHelper():
         create_dir(config.SAVED_MODELS_DIR)
         self.log_dir = os.path.join(config.SAVED_MODELS_DIR, "logs")
         create_dir(self.log_dir)
+        self.datasetHandler = DatasetHandler()
          
     # run adversarial training for one model for a list of attacks with different arguments
-    def run(self, model_class, hparams, attack_configs, save_epochs = [50, 100, 150, 200, 250]):
+    def run(self, model_class, hparams, attack_configs, save_epochs = [50, 100, 150, 200, 250],dataset_id=config.DATASET_EMERGENCY):
         
         # sanity check of arguments
         check_attack_args(attack_configs)
         
         new_model_paths = []
         
-        datasetHandler = DatasetHandler()
+        datasetHandler = self.datasetHandler 
         print("loaded!")
         
         for a, attack_config in enumerate(attack_configs):
@@ -112,8 +113,8 @@ class TrainHelper():
 
                 model = model_class(hparams)
                 model.prepare_data()
-                datasetHandler.load(model, 'training')
-                datasetHandler.load(model, 'validation') 
+                datasetHandler.load(model, 'training', dataset_id=dataset_id)
+                datasetHandler.load(model, 'validation', dataset_id=dataset_id) 
                 model.setAttack(current_attack, attack_args)
                 
                 model_title = type(model.model).__name__ + "_attack_" + (current_attack.__name__ if not meta["TITLE"] else meta["TITLE"])
