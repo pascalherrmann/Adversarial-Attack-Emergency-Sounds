@@ -95,7 +95,7 @@ class FunctionalTimeStretchAttack(Attack):
         #phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].to(self.device)
         # time stretch via phase_vocoder (not differentiable):
         #vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
-        vocoded = torchaudio.TimeStretch()(stft, speedup_rate)
+        vocoded = torchaudio.transforms.TimeStretch()(stft, speedup_rate)
         istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
         if batch.size(0) == 1:
             istft = istft.unsqueeze(0)
