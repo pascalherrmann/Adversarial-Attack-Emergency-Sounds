@@ -86,16 +86,19 @@ class FunctionalTimeStretchAttack(Attack):
         if speedup_rate == 1:
             return batch
         
+        spec = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
+                                       hop_length=self.hop_length, pad=self.pad, 
+                                       power=None, normalized=False)
+
         n_fft = torch.tensor(2048)  # windowsize
         hop_length = torch.floor(n_fft / 4.0).int().item()
 
         # time stretch
         stft = torch.stft(batch, n_fft.item(), hop_length=hop_length)
         
-        #phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].to(self.device)
+        phase_advance = torch.linspace(0, math.pi * hop_length, stft.shape[1])[..., None].to(self.device)
         # time stretch via phase_vocoder (not differentiable):
-        #vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
-        vocoded = torchaudio.transforms.TimeStretch(hop_length=hop_length, n_freq=n_fft.item())(stft, speedup_rate)
+        vocoded = AF.phase_vocoder(stft, rate=speedup_rate, phase_advance=phase_advance) 
         istft = AF.istft(vocoded, n_fft.item(), hop_length=hop_length).squeeze()
         if batch.size(0) == 1:
             istft = istft.unsqueeze(0)
