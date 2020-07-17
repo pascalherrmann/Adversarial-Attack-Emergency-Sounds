@@ -86,10 +86,6 @@ class FunctionalTimeStretchAttack(Attack):
         if speedup_rate == 1:
             return batch
         
-        spec = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
-                                       hop_length=self.hop_length, pad=self.pad, 
-                                       power=None, normalized=False)
-
         n_fft = torch.tensor(2048)  # windowsize
         hop_length = torch.floor(n_fft / 4.0).int().item()
 
