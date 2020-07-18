@@ -203,7 +203,7 @@ class RobustnessExperiment():
     # 
     # ANALYTICS
     #
-    def compare(self, config_key = "epsilon", results_key = "success_rate", models = None):
+    def compare(self, config_key = "epsilon", results_key = "success_rate", models = None, plot_title = None, colors=['r', 'darkorange', 'g', 'b', "k", 'g', 'b']):
 
         if not models:
             print("Only showing the first 7 models! Specify a model string to show specific models!")
@@ -218,11 +218,12 @@ class RobustnessExperiment():
                         model, title = model
                     else: title = model
                     ys = [ res[results_key] for res in self.all_results[attack][model]]
-                    vis_object = {"data": ys, "color" : ['r', 'darkorange', 'g', 'b', "k", 'g', 'b', ][m], "label": title}
+                    vis_object = {"data": ys, "color" : colors[m], "label": title}
                     vis_objects.append(vis_object)
 
+                
                 draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
-                         title = attack + " (after adversarial training)", 
+                         title = plot_title if plot_title else attack, 
                          save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
             except Exception as e: print(e)
 
