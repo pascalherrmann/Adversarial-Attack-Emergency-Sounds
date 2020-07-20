@@ -19,7 +19,7 @@ class AblationModel(nn.Module):
         
         self.convs = nn.Sequential(
                     nn.BatchNorm2d(1),
-                    nn.Conv2d(1, 10, kernel_size=10,stride=2),
+                    nn.Conv2d(1, 10, kernel_size=10,stride=1),
                     nn.BatchNorm2d(10),
                     nn.PReLU(),
                     nn.MaxPool2d(kernel_size=2, stride=2),
