@@ -19,23 +19,30 @@ class AblationModel(nn.Module):
         
         self.convs = nn.Sequential(
                     nn.BatchNorm2d(1),
-                    nn.Conv2d(1, 20, kernel_size=10,stride=2),
+                    nn.Conv2d(1, 10, kernel_size=10,stride=2),
+                    nn.BatchNorm2d(10),
+                    nn.PReLU(),
+                    nn.MaxPool2d(kernel_size=2, stride=2),
+                    nn.Dropout(p=hparams["p_dropout"], inplace=False),
+                    #Print(),
+                    nn.Conv2d(10, 20, kernel_size=10,stride=1),
                     nn.BatchNorm2d(20),
                     nn.PReLU(),
                     nn.MaxPool2d(kernel_size=2, stride=2),
                     nn.Dropout(p=hparams["p_dropout"], inplace=False),
-
+                    #Print(),
                     nn.Conv2d(20, 40, kernel_size=10,stride=1),
                     nn.BatchNorm2d(40),
                     nn.PReLU(),
                     nn.MaxPool2d(kernel_size=2, stride=2),
                     nn.Dropout(p=hparams["p_dropout"], inplace=False),
-
-                    nn.Conv2d(40, 80, kernel_size=5,stride=1),
+                    #Print(),
+                    nn.Conv2d(40, 80, kernel_size=2,stride=1),
                     nn.BatchNorm2d(80),
                     nn.PReLU(),
                     nn.MaxPool2d(kernel_size=2, stride=2),
                     nn.Dropout(p=hparams["p_dropout"], inplace=False),
+                    #Print()
                 )
         
         self.dense = nn.Sequential(                 
