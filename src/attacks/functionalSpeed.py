@@ -1,6 +1,7 @@
 from attacks.attack import Attack
 
 from torchaudio import functional as AF
+import torchaudio
 import torch.nn.functional as F
 import math
 import torch
