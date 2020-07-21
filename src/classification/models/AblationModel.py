@@ -6,13 +6,19 @@ import torchaudio
 
 from classification.trainer.GeneralPLModule import GeneralPLModule
 
+from torchaudio.transforms import Spectrogram, MelSpectrogram , ComplexNorm, MelScale
+from torchaudio.transforms import TimeStretch, AmplitudeToDB 
+from torch.distributions import Uniform
+
 class AblationModel(nn.Module):
     
     def __init__(self, hparams):
         super(AblationModel, self).__init__()
         self.datasets = {}
         
-        self.normal_spectrogram = hparams["normal_spectrogram"]
+        self.random_time_stretch = hparams["random_time_stretch"]
+        self.mel_scale = hparams["mel_scale"]
+        self.normalize_spectrogram = hparams["normalize_spectrogram"]
         
         self.windowsize = 800
         self.window = torch.hann_window(self.windowsize).cuda()
@@ -51,13 +57,29 @@ class AblationModel(nn.Module):
                         nn.Dropout(p=hparams["p_dropout"], inplace=False),
                         nn.Linear(hparams["n_hidden"], 2)  
                     )
+        
+        self.random_stretch = RandomTimeStretch(0.4)
+        
+        # Normalization (pot spec processing)
+        self.complex_norm = ComplexNorm(power=2.)
+        self.norm = SpecNormalization("whiten")
 
     def forward(self, batch):
         x = batch['audio']
-        if self.normal_spectrogram:
-            x = torchaudio.transforms.Spectrogram().cuda()(x)
-        else:
-            x = torchaudio.transforms.MelSpectrogram().cuda()(x)
+        
+        x = torchaudio.transforms.Spectrogram(power=None, normalized=False).cuda()(x)
+        
+        if self.training and self.random_time_stretch:
+            x, _ = self.random_stretch(x)
+        
+        # we would do this usually in spectrogram (above: normalized=False)<-> no ablation needed
+        x = self.complex_norm(x) 
+    
+        if self.mel_scale:
+            x = MelScale().cuda()(x)
+        
+        if self.normalize_spectrogram:
+            x = self.norm(x)
 
         x = x.unsqueeze(1).float()
         x = self.convs(x)
@@ -76,3 +98,39 @@ class AblationModelPLModule(GeneralPLModule):
         dataset_type = {"sample_rate": 8000}
         dataset_params = {"fixed_padding": True}
         return dataset_type, dataset_params
+
+class RandomTimeStretch(TimeStretch):
+
+    def __init__(self, max_perc, hop_length=None, n_freq=201, fixed_rate=None):
+
+        super(RandomTimeStretch, self).__init__(hop_length, n_freq, fixed_rate)
+        self._dist = Uniform(1.-max_perc, 1+max_perc)
+
+    def forward(self, x):
+        rate = self._dist.sample().item()
+        return super(RandomTimeStretch, self).forward(x, rate), rate
+
+class SpecNormalization(nn.Module):
+
+    def __init__(self, norm_type, top_db=80.0):
+
+        super(SpecNormalization, self).__init__()
+
+        if 'db' == norm_type:
+            self._norm = AmplitudeToDB(stype='power', top_db=top_db)
+        elif 'whiten' == norm_type:
+            self._norm = lambda x: self.z_transform(x)
+        else:
+            self._norm = lambda x: x
+    
+    def z_transform(self, x):
+        # Independent mean, std per batch
+        non_batch_inds = [1, 2]
+        mean = x.mean(non_batch_inds, keepdim=True)
+        std = x.std(non_batch_inds, keepdim=True)
+        x = (x - mean)/std 
+        return x
+
+    def forward(self, x):
+        return self._norm(x)
+
