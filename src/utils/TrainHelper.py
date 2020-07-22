@@ -4,7 +4,7 @@ from itertools import product
 import pytorch_lightning as pl
 from pytorch_lightning import loggers
 
-from utils.RobustnessExperiment import create_dir, save_json, write_to_file, save_pickle, load_pickle, load_module
+from utils.RobustnessExperiment import create_dir, write_to_file, save_pickle, load_pickle, load_module
 from attacks.attack import Attack
 from datasets.datasethandler import DatasetHandler
 import config
