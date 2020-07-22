@@ -61,5 +61,3 @@ For questions and feedback please contact:
 [7] Subramanian, Vinod, et al. "Adversarial attacks in sound event classification." arXiv preprint arXiv:1907.02477 (2019).
 
 [8] Ebizuka, Yuki, Shin Kato, and Makoto Itami. "Detecting approach of emergency vehicles using siren sound processing." 2019 IEEE Intelligent Transportation Systems Conference (ITSC). IEEE, 2019
-Like
-Be the first to like this
