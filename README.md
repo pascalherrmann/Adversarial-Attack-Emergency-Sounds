@@ -17,7 +17,7 @@ In this project we (1) compile a dataset for emergency vehicle classification, (
 
 To the best of our knowledge, we are the first to describe sound property attacks and functional attacks against end-to-end sound classifiers.
 
-## Project structure
+## Project Structure
 
 TODO: 
 ```
