@@ -19,9 +19,23 @@ To the best of our knowledge, we are the first to describe sound property attack
 
 ## Project Structure
 
-TODO: 
 ```
-!tree .
+├── notebooks
+│   ├── datasets
+│   ├── evaluations
+│   ├── utils
+│   ├── attack_exploration.ipynb
+│   ├── attacks-usage.ipynb
+│   ├── experiments.ipynb
+│   ├── randomized_smoothing.ipynb
+│   └── wiki_plots.ipynb
+├── README.md
+└── src
+    ├── datasets
+    ├── classification
+    ├── attacks
+    ├── utils
+    └── config.py
 ```
 
 ## Contact
