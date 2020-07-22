@@ -4,16 +4,16 @@ In recent years, the robustness of machine learning models has been addressed in
 
 ## Main Contributions
 
-In this project we (1) compile a dataset for emergency vehicle classification, (2) implement state-of-the-art end-to-end machine learning approaches for audio classification and fine-tune them on our emergency vehicle detection dataset, (3) develop adversarial attacks against end-to-end audio classification models, (4) evaluate the robustness of our models, and (5) improve their robustness by deploying various adversarial training techniques. The following list gives a more detailed overview about our contributions and where you can find more information in the Wiki:
+In this project we (1) compile a dataset for emergency vehicle classification, (2) implement state-of-the-art end-to-end machine learning approaches for audio classification and fine-tune them on our emergency vehicle detection dataset, (3) develop adversarial attacks against end-to-end audio classification models, (4) evaluate the robustness of our models, and (5) improve their robustness by deploying various adversarial training techniques. The following list gives a more detailed overview about our contributions:
 
-    - Dataset construction (Datasets)
-    - Implementation and fine-tuning of 4 end-to-end models (Emergency Vehicle Detection Approaches)
-    - Development of adversarial attacks (Adversarial Attacks)
-        - Standard noise attacks (Standard Noise Attacks)
-        - Sound property attacks (Sound Property Attacks)
-        - Functional attacks (Functional Attacks)
-    - Robustness analysis using adversarial attacks (Robustness Analysis)
-    - Robustness enhancement via adversarial training (Adversarial Training)
+    - Dataset construction
+    - Implementation and fine-tuning of 4 end-to-end models 
+    - Development of adversarial attacks 
+        - Standard noise attacks 
+        - Sound property attacks
+        - Functional attacks 
+    - Robustness analysis using adversarial attacks 
+    - Robustness enhancement via adversarial training
 
 To the best of our knowledge, we are the first to describe sound property attacks and functional attacks against end-to-end sound classifiers.
 
