@@ -3,6 +3,9 @@ from attacks.attack import Attack
 import torch.nn.functional as F
 import torch 
 
+'''
+    In the Wiki, we call this attack Functional Overlay attacks
+'''
 class FunctionalInterpolationAttack(Attack):
     '''
     Interpolation attack: 

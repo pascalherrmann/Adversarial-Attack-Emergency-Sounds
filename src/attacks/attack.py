@@ -6,9 +6,16 @@ from tqdm import tqdm
 from copy import deepcopy
 import torch
 
+'''
+    [abstract class]
+
+    - General attack class of our project
+    - Performs arbitrary attack
+    - Saves adversarial examples
+    - Computes statistics
+'''
 class Attack(ABC):
     
-    # TODO: refactor camelCase: attackSample -> attack_sample
     def __init__(self, model, data_loader,
                     attack_parameters, early_stopping=-1,
                     device='cuda', save_samples=True):
