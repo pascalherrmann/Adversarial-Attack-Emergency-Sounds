@@ -3,6 +3,12 @@ from attacks.attack import Attack
 import torch.nn.functional as F
 import torch 
 
+'''
+    - In the Wiki, we call this Overlay attacks
+    - Note the term interpolation is actually more accurate, since:
+        - For alpha=1, beta=2: we get only the original sample
+        - For alpha=0, beta=1: we get only the overlay
+'''
 class InterpolationAttack(Attack):
     '''
     Interpolation attack: 

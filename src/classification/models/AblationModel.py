@@ -72,7 +72,7 @@ class AblationModel(nn.Module):
         if self.training and self.random_time_stretch:
             x, _ = self.random_stretch(x)
         
-        # we would do this usually in spectrogram (above: normalized=False)<-> no ablation needed
+        # we would do this usually in spectrogram (above: power=False)<-> no ablation needed
         x = self.complex_norm(x) 
     
         if self.mel_scale:
