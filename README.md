@@ -29,7 +29,6 @@ To the best of our knowledge, we are the first to describe sound property attack
 │   ├── experiments.ipynb
 │   ├── randomized_smoothing.ipynb
 │   └── wiki_plots.ipynb
-├── README.md
 └── src
     ├── datasets
     ├── classification
