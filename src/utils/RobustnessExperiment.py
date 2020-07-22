@@ -45,10 +45,6 @@ def check_experiment_configs(experiment_configs):
         assert "attack_arg" in c.keys()
         assert "meta" in c.keys()
         
-def save_json(obj, path):
-    with open(path, 'w') as fp:
-        json.dump(obj, fp, indent=4)  
-        
 def write_to_file(content, path):
     file_object = open(path, 'a')
     file_object.write(content)
@@ -97,9 +93,7 @@ class RobustnessExperiment():
         self.all_results = {}
         create_dir(self.dir)
         
-        # back up experiment_configs
-        save_json(str(experiment_configs), os.path.join(self.dir, "experiment_configs_#{}.json".format(self.id)))
-        
+
         # save as pickle
         #filehandler = open(os.path.join(self.dir, "experiment_#{}.pickle".format(self.id)), 'wb') 
         #pickle.dump(self, filehandler)
@@ -144,12 +138,9 @@ class RobustnessExperiment():
             info += key_y + "\t\t" + str(ys) + "\n\n"
             write_to_file(info, os.path.join(self.dir, "summary.txt"))
 
-            # save json
-            save_json(current_attack_report, os.path.join(results_dir, "json_{}_{}.json".format(title,model_name)))
 
         if title not in self.all_results: self.all_results[title] = {"CONFIGS": list_attack_args}
         self.all_results[title][model_name] = current_attack_report
-        save_json(self.all_results, os.path.join(self.dir, "exp#{}_all_results.json".format(self.id)))
         self.backup()
 
         return current_attack_report
@@ -203,7 +194,7 @@ class RobustnessExperiment():
     # 
     # ANALYTICS
     #
-    def compare(self, config_key = "epsilon", results_key = "success_rate", models = None, plot_title = None, colors=['r', 'darkorange', 'g', 'b', "k", 'g', 'b']):
+    def compare(self, config_key = "epsilon", results_key = "success_rate", models = None, plot_title = None, colors=['r', 'darkorange', 'g', 'b', "k", 'g', 'b'], skip_configs = 0, x_title = None):
 
         if not models:
             print("Only showing the first 7 models! Specify a model string to show specific models!")
@@ -217,12 +208,12 @@ class RobustnessExperiment():
                     if len(model) == 2:
                         model, title = model
                     else: title = model
-                    ys = [ res[results_key] for res in self.all_results[attack][model]]
+                    ys = [ res[results_key] for res in self.all_results[attack][model]][skip_configs:]
                     vis_object = {"data": ys, "color" : colors[m], "label": title}
                     vis_objects.append(vis_object)
 
                 
-                draw_plot(x = xs, data = vis_objects, x_label = config_key, y_label = results_key, 
+                draw_plot(x = xs[skip_configs:], data = vis_objects, x_label = x_title if x_title else config_key, y_label = results_key, 
                          title = plot_title if plot_title else attack, 
                          save_path = os.path.join(self.dir, "plot_comparison_{}.pdf".format(attack)))
             except Exception as e: print(e)

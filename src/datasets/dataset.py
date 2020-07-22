@@ -13,11 +13,12 @@ class Dataset(Dataset):
     def __init__(self, dataset_id=config.DATASET_EMERGENCY,
                  sample_rate=48000, 
                  split_mode="training", 
-                 fixed_padding=True):
+                 fixed_padding=True, length = 10):
         
         assert split_mode in ["training", "validation", "testing"]
         self.sample_rate = sample_rate
         self.fixed_padding = fixed_padding
+        self.length = length
         
         if sample_rate == 8000:
             self.max_length_sample = 80249 # manually determined
@@ -35,7 +36,7 @@ class Dataset(Dataset):
             assert (self.max_length_sample - len(audio)) >= 0
             audio = F.pad(audio, (0, self.max_length_sample - len(audio)), mode='constant', value=0)
 
-        return {'audio': audio, 
+        return {'audio': audio[:self.sample_rate * self.length], 
                 'sample_rate': self.sample_rate, 
                 'label': 1 if self.dataset[index]['binary_class'] == 'positive' else 0}
     
