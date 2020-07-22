@@ -6,14 +6,14 @@ In recent years, the robustness of machine learning models has been addressed in
 
 In this project we (1) compile a dataset for emergency vehicle classification, (2) implement state-of-the-art end-to-end machine learning approaches for audio classification and fine-tune them on our emergency vehicle detection dataset, (3) develop adversarial attacks against end-to-end audio classification models, (4) evaluate the robustness of our models, and (5) improve their robustness by deploying various adversarial training techniques. The following list gives a more detailed overview about our contributions:
 
-    - Dataset construction
-    - Implementation and fine-tuning of 4 end-to-end models 
-    - Development of adversarial attacks 
-        - Standard noise attacks 
-        - Sound property attacks
-        - Functional attacks 
-    - Robustness analysis using adversarial attacks 
-    - Robustness enhancement via adversarial training
+- Dataset construction
+- Implementation and fine-tuning of 4 end-to-end models 
+- Development of adversarial attacks 
+    - Standard noise attacks 
+    - Sound property attacks
+    - Functional attacks 
+- Robustness analysis using adversarial attacks 
+- Robustness enhancement via adversarial training
 
 To the best of our knowledge, we are the first to describe sound property attacks and functional attacks against end-to-end sound classifiers.
 
@@ -24,5 +24,5 @@ To the best of our knowledge, we are the first to describe sound property attack
 
 For questions and feedback please contact:
 
-    - Pascal Herrmann (pascal.herrmann@tum.de)
-    - Yan Scholten (yan.scholten@tum.de)
+- Pascal Herrmann (pascal.herrmann@tum.de)
+- Yan Scholten (yan.scholten@tum.de)
