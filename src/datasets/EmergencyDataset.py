@@ -25,7 +25,6 @@ class EmergencyDataset(Dataset):
         print("DEPRECATED EM Dataset")
         # initially "mode" was used, thats deprecated now
         # now we use "split_mode"
-        # TODO refactor:
         if split_mode == "training":
             mode = "train"
         elif split_mode == "validation":
